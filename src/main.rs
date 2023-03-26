@@ -52,18 +52,16 @@ async fn auth(
     auth: BasicAuth
 ) -> Result<HttpResponse> {
     let mut pool = pool.lock().unwrap();
-    {
-        let pool = pool.as_mut().unwrap();
+    let pool = pool.as_mut().unwrap();
 
-        if let Some(password) = auth.password() {
-            if verify(pool, &secret, auth.user_id(), password).await {
-                Ok(HttpResponse::Ok().finish())
-            } else {
-                Ok(HttpResponse::Forbidden().finish())
-            }
+    if let Some(password) = auth.password() {
+        if verify(pool, &secret, auth.user_id(), password).await {
+            Ok(HttpResponse::Ok().finish())
         } else {
             Ok(HttpResponse::Forbidden().finish())
         }
+    } else {
+        Ok(HttpResponse::Forbidden().finish())
     }
 }
 
