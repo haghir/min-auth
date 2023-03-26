@@ -104,7 +104,7 @@ async fn main() -> std::io::Result<()> {
     let redis_lifetime = get_enval("REDIS_LIFETIME", "3600");
 
     let mysql_host = get_enval("MYSQL_HOST", "127.0.0.1");
-    let mysql_port = get_enval("MYSQL_HOST", "3306").parse::<u16>().unwrap();
+    let mysql_port = get_enval("MYSQL_PORT", "3306").parse::<u16>().unwrap();
     let mysql_username = get_enval("MYSQL_USERNAME", "minauth"); // default for debug
     let mysql_password = get_enval("MYSQL_PASSWORD", "minauth"); // default for debug
     let mysql_dbname = get_enval("MYSQL_DBNAME", "minauth");
