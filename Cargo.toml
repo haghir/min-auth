@@ -13,3 +13,4 @@ actix-web-httpauth = "0.8"
 mysql_async = "0.31"
 sha2 = "0.10"
 hex = "0.4"
+redis = { version = "0.22", features = ["tokio-comp"] }
