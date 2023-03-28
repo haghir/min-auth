@@ -103,21 +103,18 @@ async fn verify(
         .await
         .unwrap();
 
+    // For performance, the authenticated credentials will be stored in the Redis database.
     if let Some(pwhash) = pwhash {
         let _: () = redconn.set_ex(user_id, pwhash.as_str(), redis_lifetime).await.unwrap();
 
         if target.eq(&pwhash) {
             debug!("Succeeded.");
-            true
-        } else {
-            debug!("Failed.");
-            false
+            return true;
         }
-    } else {
-        let _: () = redconn.set_ex(user_id, "", redis_lifetime).await.unwrap();
-        debug!("Failed.");
-        false
     }
+
+    debug!("Failed.");
+    false
 }
 
 #[get("/auth")]
