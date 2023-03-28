@@ -16,8 +16,9 @@ struct CredContext {
 
 impl CredContext {
     async fn close(&mut self) {
-        let mysql_pool = std::mem::replace(&mut self.mysql, None);
-        mysql_pool.unwrap().disconnect().await.unwrap();
+        if let Some(mysql_pool) = std::mem::replace(&mut self.mysql, None) {
+            mysql_pool.disconnect().await.unwrap();
+        }
     }
 }
 
