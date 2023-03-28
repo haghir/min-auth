@@ -18,6 +18,7 @@ impl CredContext {
     async fn close(&mut self) {
         if let Some(mysql_pool) = std::mem::replace(&mut self.mysql, None) {
             mysql_pool.disconnect().await.unwrap();
+            info!("MySQL connection pool was disconnected.");
         }
     }
 }
@@ -167,8 +168,6 @@ async fn main() -> std::io::Result<()> {
 
     let mut cred_ctx = cred_ctx.lock().unwrap();
     cred_ctx.close().await;
-
-    info!("All connections was closed.");
 
     ret
 }
