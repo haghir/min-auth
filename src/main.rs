@@ -80,18 +80,17 @@ async fn verify(
     // Calculate a SHA256 digest of a string concatenated the secret and the password.
     let password = format!("{}{}", secret, password);
     let target = get_hash(password.as_str()).to_lowercase();
-    debug!("Authenticating '{}' with {}.", user_id, target);
 
     // If the credential information for the user is cached,
     // it is not necessary to check the record in MySQL.
     if let Ok(cached) = redconn.get::<&str, String>(user_id).await {
-        debug!("A cached credential information was found.");
-
         return if target.eq(&cached) {
-            debug!("Succeeded.");
+            info!("Succeeded to authenticate \"{}\". (cached)", user_id);
+            debug!("Credential: {}", target);
             true
         } else {
-            debug!("Failed.");
+            info!("Failed to authenticate \"{}\". (cached)", user_id);
+            debug!("Credential: {}", target);
             false
         }
     }
@@ -108,12 +107,14 @@ async fn verify(
         let _: () = redconn.set_ex(user_id, pwhash.as_str(), redis_lifetime).await.unwrap();
 
         if target.eq(&pwhash) {
-            debug!("Succeeded.");
+            info!("Succeeded to authenticate \"{}\".", user_id);
+            debug!("Credential: {}", target);
             return true;
         }
     }
 
-    debug!("Failed.");
+    info!("Failed to authenticate \"{}\".", user_id);
+    debug!("Credential: {}", target);
     false
 }
 
