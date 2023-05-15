@@ -77,45 +77,41 @@ async fn verify(
     let redconn = cred_ctx.redis.as_mut().unwrap();
     let mut redconn = redconn.get_async_connection().await.unwrap();
 
-    // Calculate a SHA256 digest of a string concatenated the secret and the password.
-    let password = format!("{}{}", secret, password);
-    let target = get_hash(password.as_str()).to_lowercase();
-
     // If the credential information for the user is cached,
     // it is not necessary to check the record in MySQL.
-    if let Ok(cached) = redconn.get::<&str, String>(user_id).await {
-        return if target.eq(&cached) {
-            info!("Succeeded to authenticate \"{}\". (cached)", user_id);
-            debug!("Credential: {}", target);
-            true
+    let cred = if let Ok(cached) = redconn.get::<&str, (String, String)>(user_id).await {
+        cached
+    } else {
+        // Retrieve the credential information from the MySQL database.
+        let cred: Option<(String, String)> = "SELECT salt, pwhash FROM credentials WHERE id = :id"
+            .with(params! { "id" => user_id })
+            .first(&mut myconn)
+            .await
+            .unwrap();
+
+        // For performance, the authenticated credentials will be stored in the Redis database.
+        if let Some(cred) = cred {
+            let _: () = redconn.set_ex(user_id, &cred, redis_lifetime).await.unwrap();
+            cred
         } else {
-            info!("Failed to authenticate \"{}\". (cached)", user_id);
-            debug!("Credential: {}", target);
-            false
+            info!("User ID \"{}\" is not found.", user_id);
+            return false;
         }
+    };
+
+    // Calculate a SHA256 digest of a string concatenated the secret and the password.
+    let password = format!("{}{}{}", secret, cred.0, password);
+    let target = get_hash(password.as_str()).to_lowercase();
+
+    if target.eq(&cred.1) {
+        info!("Succeeded to authenticate \"{}\".", user_id);
+        debug!("Credential: {}", target);
+        true
+    } else {
+        info!("Failed to authenticate \"{}\".", user_id);
+        debug!("Credential: {}", target);
+        false
     }
-
-    // Retrieve the credential information from the MySQL database.
-    let pwhash: Option<String> = "SELECT pwhash FROM credentials WHERE id = :id"
-        .with(params! { "id" => user_id })
-        .first(&mut myconn)
-        .await
-        .unwrap();
-
-    // For performance, the authenticated credentials will be stored in the Redis database.
-    if let Some(pwhash) = pwhash {
-        let _: () = redconn.set_ex(user_id, pwhash.as_str(), redis_lifetime).await.unwrap();
-
-        if target.eq(&pwhash) {
-            info!("Succeeded to authenticate \"{}\".", user_id);
-            debug!("Credential: {}", target);
-            return true;
-        }
-    }
-
-    info!("Failed to authenticate \"{}\".", user_id);
-    debug!("Credential: {}", target);
-    false
 }
 
 #[get("/auth")]
