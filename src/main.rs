@@ -2,6 +2,8 @@ use actix_web::{web::Data, get, App, HttpServer, HttpResponse, Result};
 use actix_web_httpauth::extractors::basic::BasicAuth;
 use mysql_async::{prelude::*, Opts, OptsBuilder, Pool as MySQLPool};
 use redis::{Client as RedisClient, AsyncCommands};
+use serde::{Serialize, Deserialize};
+use serde_json::json;
 use sha2::{Sha256, Digest};
 use std::{env, sync::Mutex};
 use log::{info, debug};
@@ -21,6 +23,12 @@ impl CredContext {
             info!("MySQL connection pool was disconnected.");
         }
     }
+}
+
+#[derive(Serialize, Deserialize)]
+struct Credential {
+    salt: String,
+    pwhash: String,
 }
 
 fn get_enval(name: &str, default: &str) -> String {
@@ -79,8 +87,9 @@ async fn verify(
 
     // If the credential information for the user is cached,
     // it is not necessary to check the record in MySQL.
-    let cred = if let Ok(cached) = redconn.get::<&str, (String, String)>(user_id).await {
-        cached
+    let cred = if let Ok(cached) = redconn.get::<&str, String>(user_id).await {
+        info!("The credential information for \"{}\" is found in the cache.", user_id);
+        serde_json::from_str(cached.as_str()).unwrap()
     } else {
         // Retrieve the credential information from the MySQL database.
         let cred: Option<(String, String)> = "SELECT salt, pwhash FROM credentials WHERE id = :id"
@@ -91,7 +100,9 @@ async fn verify(
 
         // For performance, the authenticated credentials will be stored in the Redis database.
         if let Some(cred) = cred {
-            let _: () = redconn.set_ex(user_id, &cred, redis_lifetime).await.unwrap();
+            let cred = Credential { salt: cred.0, pwhash: cred.1 };
+            let json = json!(&cred).to_string();
+            let _: () = redconn.set_ex(user_id, json.as_str(), redis_lifetime).await.unwrap();
             cred
         } else {
             info!("User ID \"{}\" is not found.", user_id);
@@ -100,10 +111,10 @@ async fn verify(
     };
 
     // Calculate a SHA256 digest of a string concatenated the secret and the password.
-    let password = format!("{}{}{}", secret, cred.0, password);
+    let password = format!("{}{}{}", secret, cred.salt, password);
     let target = get_hash(password.as_str()).to_lowercase();
 
-    if target.eq(&cred.1) {
+    if target.eq(&cred.pwhash) {
         info!("Succeeded to authenticate \"{}\".", user_id);
         debug!("Credential: {}", target);
         true
