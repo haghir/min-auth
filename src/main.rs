@@ -5,7 +5,7 @@ use redis::{Client as RedisClient, AsyncCommands};
 use serde::{Serialize, Deserialize};
 use serde_json::json;
 use sha2::{Sha256, Digest};
-use std::{env, sync::Mutex};
+use std::{env, fs, sync::Mutex};
 use log::{info, debug};
 
 struct CredContext {
@@ -32,9 +32,13 @@ struct Credential {
 }
 
 fn get_enval(name: &str, default: &str) -> String {
+    let fname = format!("{}_FILE", name);
     match env::var(name) {
         Ok(val) => val,
-        Err(_) => default.to_string(),
+        Err(_) => match env::var(fname.as_str()) {
+            Ok(val) => fs::read_to_string(val).unwrap(),
+            Err(_) => default.to_string(),
+        },
     }
 }
 
