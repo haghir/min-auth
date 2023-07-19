@@ -1,0 +1,14 @@
+[Unit]
+Description=Mini Authenticator
+
+[Service]
+Type=simple
+EnvironmentFile=<Path to Environment File>
+ExecStart=<Path to Executable>
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=min-auth
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target
