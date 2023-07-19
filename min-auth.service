@@ -3,6 +3,8 @@ Description=Mini Authenticator
 
 [Service]
 Type=simple
+User=min-auth
+Group=min-auth
 EnvironmentFile=<Path to Environment File>
 ExecStart=<Path to Executable>
 StandardOutput=syslog
