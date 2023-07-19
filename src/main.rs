@@ -162,6 +162,7 @@ async fn main() -> std::io::Result<()> {
         let cred_ctx = Data::clone(&cred_ctx);
         let redis_lifetime = Data::new(get_enval_usize("REDIS_LIFETIME", "3600"));
         let secret = Data::new(get_enval("PASSWORD_SECRET", ""));
+        let expose = get_enval("MINAUTH_EXPOSE", "0.0.0.0:3000");
 
         HttpServer::new(move || {
             App::new()
@@ -170,7 +171,7 @@ async fn main() -> std::io::Result<()> {
                 .app_data(Data::clone(&secret))
                 .service(auth)
         })
-            .bind("0.0.0.0:3000")?
+            .bind(expose.as_str())?
             .run()
             .await
     };
