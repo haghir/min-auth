@@ -1,5 +1,6 @@
 [Unit]
 Description=Mini Authenticator
+After=mysql.service redis-server.service
 
 [Service]
 Type=simple
@@ -7,8 +8,8 @@ User=min-auth
 Group=min-auth
 EnvironmentFile=<Path to Environment File>
 ExecStart=<Path to Executable>
-StandardOutput=syslog
-StandardError=syslog
+StandardOutput=journal
+StandardError=journal
 SyslogIdentifier=min-auth
 KillSignal=SIGTERM
 
