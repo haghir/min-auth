@@ -23,4 +23,4 @@ config.toml: Makefile target/release/min-auth-genconfig
 	target/release/min-auth-genconfig > config-1.toml
 
 min-auth@.service: Makefile target/release/min-auth-genservice
-	target/release/min-auth-genservice --bindir "$(bindir)" --confdir "$(sysconfdir)/min-auth" > min-auth.service
+	target/release/min-auth-genservice --bindir "$(bindir)" --confdir "$(sysconfdir)/min-auth" > min-auth@.service
