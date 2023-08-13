@@ -2,6 +2,7 @@ use serde::{Serialize, Deserialize};
 use serde_json::json;
 use sha2::{Sha256, Digest};
 use toml::{de::from_str, ser::to_string};
+use log::debug;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct MinAuthConfig {
@@ -58,6 +59,8 @@ impl Credential {
     pub fn verify(&self, secret: &String, password: &str) -> bool {
         let plain = format!("{}{}{}", secret, self.salt, password);
         let pwhash = get_hash(plain.as_str());
+        debug!("registered: {}", self.pwhash);
+        debug!("calculated: {}", pwhash);
         plain.eq_ignore_ascii_case(&pwhash)
     }
 }
