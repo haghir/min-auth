@@ -5,8 +5,8 @@
 *.orig
 
 # Generated files
-/config.toml
-/min-auth.service
+/config-1.toml
+/min-auth@.service
 
 # Rust
 /target

@@ -19,7 +19,7 @@ target/release/min-auth-loader: Makefile src/lib.rs src/bin/min-auth-loader.rs
 target/release/min-auth-web: Makefile src/lib.rs src/bin/min-auth-web.rs
 	cargo build --release
 
-config.toml: Makefile target/release/min-auth-genconfig
+config-1.toml: Makefile target/release/min-auth-genconfig
 	target/release/min-auth-genconfig > config-1.toml
 
 min-auth@.service: Makefile target/release/min-auth-genservice
