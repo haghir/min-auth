@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.71])
-AC_INIT([min-auth], [2.0], [])
+AC_INIT([min-auth], [2.0.0], [])
 AM_INIT_AUTOMAKE([foreign])
 
 # Checks for programs.
