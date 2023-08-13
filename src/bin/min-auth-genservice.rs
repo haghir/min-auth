@@ -10,7 +10,7 @@ fn main() {
     let bindir = matches.opt_str("b").unwrap();
     let confdir = matches.opt_str("c").unwrap();
 
-    println!(r#"[Unit]
+    print!(r#"[Unit]
 Description=Mini Authenticator
 After=mysql.service redis-server.service
 
@@ -26,5 +26,6 @@ SyslogIdentifier=min-auth
 KillSignal=SIGTERM
 
 [Install]
-WantedBy=multi-user.target"#);
+WantedBy=multi-user.target
+"#);
 }

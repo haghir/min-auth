@@ -20,5 +20,5 @@ fn main() {
     };
 
     let toml: String = (&config).try_into().unwrap();
-    println!("{}", toml);
+    print!("{}", toml);
 }
