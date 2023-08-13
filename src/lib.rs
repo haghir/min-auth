@@ -61,7 +61,7 @@ impl Credential {
         let pwhash = get_hash(plain.as_str());
         debug!("registered: {}", self.pwhash);
         debug!("calculated: {}", pwhash);
-        plain.eq_ignore_ascii_case(&pwhash)
+        self.pwhash.eq_ignore_ascii_case(&pwhash)
     }
 }
 
