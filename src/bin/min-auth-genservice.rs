@@ -25,6 +25,7 @@ StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=min-auth
 KillSignal=SIGTERM
+TimeoutSec=10
 
 [Install]
 WantedBy=multi-user.target

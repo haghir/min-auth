@@ -5,6 +5,7 @@
 *.orig
 
 # Generated files
+/min-auth-monitor
 /config-1.toml
 /min-auth@.service
 
