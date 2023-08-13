@@ -2,7 +2,7 @@ bin_SCRIPTS  = target/release/min-auth-loader
 bin_SCRIPTS += target/release/min-auth-web
 
 confdir = $(sysconfdir)/min-auth
-conf_DATA = config.toml
+conf_DATA = config-1.toml
 
 sharedir = $(datadir)/min-auth
 share_DATA = min-auth@.service
