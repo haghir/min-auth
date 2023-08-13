@@ -11,7 +11,7 @@ fn main() {
     let confdir = matches.opt_str("c").unwrap();
 
     print!(r#"[Unit]
-Description=Mini Authenticator
+Description=Mini Authenticator on %I
 After=mysql.service redis-server.service
 
 [Service]
