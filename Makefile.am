@@ -2,7 +2,7 @@ bin_SCRIPTS  = target/release/min-auth-loader
 bin_SCRIPTS += target/release/min-auth-web
 
 confdir = $(sysconfdir)/min-auth
-conf_DATA = config-1.toml
+conf_DATA = config-1.toml.default
 
 sharedir = $(datadir)/min-auth
 share_DATA = min-auth@.service
@@ -19,8 +19,8 @@ target/release/min-auth-loader: Makefile src/lib.rs src/bin/min-auth-loader.rs
 target/release/min-auth-web: Makefile src/lib.rs src/bin/min-auth-web.rs
 	cargo build --release
 
-config-1.toml: Makefile target/release/min-auth-genconfig
-	target/release/min-auth-genconfig > config-1.toml
+config-1.toml.default: Makefile target/release/min-auth-genconfig
+	target/release/min-auth-genconfig > config-1.toml.default
 
 min-auth@.service: Makefile target/release/min-auth-genservice
 	target/release/min-auth-genservice --bindir "$(bindir)" --confdir "$(sysconfdir)/min-auth" > min-auth@.service

@@ -18,6 +18,7 @@ After=mysql.service redis-server.service
 Type=simple
 User=min-auth
 Group=min-auth
+Environment=RUST_LOG=info
 ExecStartPre={bindir}/min-auth-loader -c {confdir}/config-%i.toml
 ExecStart={bindir}/min-auth-web -c {confdir}/config-%i.toml
 StandardOutput=journal
