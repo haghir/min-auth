@@ -15,7 +15,7 @@ fn main() {
         },
         redis: RedisConfig {
             uri: "redis://127.0.0.1:6379/0".to_string(),
-            lifetime: 300,
+            lifetime: 600,
         },
     };
 
