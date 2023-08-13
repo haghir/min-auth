@@ -26,6 +26,5 @@ SyslogIdentifier=min-auth
 KillSignal=SIGTERM
 
 [Install]
-WantedBy=multi-user.target
-"#);
+WantedBy=multi-user.target"#);
 }
