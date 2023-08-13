@@ -6,6 +6,7 @@
 
 # Generated files
 /config.toml
+/min-auth.service
 
 # Rust
 /target
