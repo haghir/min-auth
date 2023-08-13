@@ -14,7 +14,7 @@ fn main() {
 
 AUTH_URI="$({bindir}/min-auth-getauthuri -c {confdir}/config-${{1}}.toml)"
 
-if ! curl -m 5 "${AUTH_URI}" ; then
+if ! curl -m 5 "${{AUTH_URI}}" ; then
 	systemctl restart min-auth@${{1}}
 fi
 "#);
