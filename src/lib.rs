@@ -6,7 +6,7 @@ use log::debug;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct MinAuthConfig {
-    pub expose: String,
+    pub hostname: String,
     pub password_secret: String,
 }
 

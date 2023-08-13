@@ -4,7 +4,7 @@ bin_SCRIPTS += target/release/min-auth-getauthuri
 bin_SCRIPTS += min-auth-monitor
 
 confdir = $(sysconfdir)/min-auth
-conf_DATA = config-1.toml.default
+conf_DATA = config.toml.default
 
 sharedir = $(datadir)/min-auth
 share_DATA = min-auth@.service
@@ -30,8 +30,8 @@ target/release/min-auth-getauthuri: Makefile src/lib.rs src/bin/min-auth-getauth
 min-auth-monitor: Makefile target/release/min-auth-genmonitor
 	target/release/min-auth-genmonitor --bindir "$(bindir)" --confdir "$(sysconfdir)/min-auth" > min-auth-monitor
 
-config-1.toml.default: Makefile target/release/min-auth-genconfig
-	target/release/min-auth-genconfig > config-1.toml.default
+config.toml.default: Makefile target/release/min-auth-genconfig
+	target/release/min-auth-genconfig > config.toml.default
 
 min-auth@.service: Makefile target/release/min-auth-genservice
 	target/release/min-auth-genservice --bindir "$(bindir)" --confdir "$(sysconfdir)/min-auth" > min-auth@.service

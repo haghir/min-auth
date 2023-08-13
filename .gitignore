@@ -6,7 +6,7 @@
 
 # Generated files
 /min-auth-monitor
-/config-1.toml.default
+/config.toml.default
 /min-auth@.service
 
 # Rust
