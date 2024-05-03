@@ -1,5 +1,5 @@
 bin_SCRIPTS  = target/release/min-auth-loader
-bin_SCRIPTS += target/release/min-auth-web
+bin_SCRIPTS += target/release/min-auth-auth
 bin_SCRIPTS += target/release/min-auth-getauthuri
 bin_SCRIPTS += min-auth-monitor
 
@@ -21,7 +21,7 @@ target/release/min-auth-genservice: Makefile src/lib.rs src/bin/min-auth-genserv
 target/release/min-auth-loader: Makefile src/lib.rs src/bin/min-auth-loader.rs
 	cargo build --release
 
-target/release/min-auth-web: Makefile src/lib.rs src/bin/min-auth-web.rs
+target/release/min-auth-auth: Makefile src/lib.rs src/bin/min-auth-auth.rs
 	cargo build --release
 
 target/release/min-auth-getauthuri: Makefile src/lib.rs src/bin/min-auth-getauthuri.rs

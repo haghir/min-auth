@@ -20,7 +20,7 @@ User=min-auth
 Group=min-auth
 Environment=RUST_LOG=info
 ExecStartPre={bindir}/min-auth-loader -c {confdir}/config.toml
-ExecStart={bindir}/min-auth-web -c {confdir}/config.toml -p %i
+ExecStart={bindir}/min-auth-auth -c {confdir}/config.toml -p %i
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=min-auth
