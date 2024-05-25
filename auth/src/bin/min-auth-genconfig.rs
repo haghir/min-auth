@@ -1,4 +1,4 @@
-use min_auth::{Config, MinAuthConfig, MySQLConfig, RedisConfig};
+use min_auth_auth::{Config, MinAuthConfig, MySQLConfig, RedisConfig};
 
 fn main() {
     let config = Config {

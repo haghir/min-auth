@@ -4,7 +4,7 @@ use redis::{Client as RedisClient, Commands};
 use std::env;
 use log::{info, debug};
 
-use min_auth::{Config, Credential};
+use min_auth_auth::{Config, Credential};
 
 fn main() {
     env_logger::init();

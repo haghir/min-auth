@@ -5,7 +5,7 @@ use redis::{Client as RedisClient, AsyncCommands};
 use std::{env, sync::Mutex};
 use log::{info, debug};
 
-use min_auth::{Config, Credential};
+use min_auth_auth::{Config, Credential};
 
 struct WebContext {
     // Redis client
