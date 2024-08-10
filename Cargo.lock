@@ -30,7 +30,7 @@ dependencies = [
  "actix-service",
  "actix-utils",
  "ahash 0.8.11",
- "base64 0.21.7",
+ "base64",
  "bitflags 2.5.0",
  "brotli",
  "bytes",
@@ -189,7 +189,7 @@ checksum = "1d613edf08a42ccc6864c941d30fe14e1b676a77d16f1dbadc1174d065a0a775"
 dependencies = [
  "actix-utils",
  "actix-web",
- "base64 0.21.7",
+ "base64",
  "futures-core",
  "futures-util",
  "log",
@@ -258,12 +258,6 @@ checksum = "94fb8275041c72129eb51b7d0322c29b8387a0386127718b096429201a5d6ece"
 dependencies = [
  "alloc-no-stdlib",
 ]
-
-[[package]]
-name = "allocator-api2"
-version = "0.2.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c6cb57a04249c6480766f7f7cef5467412af1490f8d1e243141daddada3264f"
 
 [[package]]
 name = "android-tzdata"
@@ -374,30 +368,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
 
 [[package]]
-name = "base64"
-version = "0.22.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
-
-[[package]]
 name = "bigdecimal"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a6773ddc0eafc0e509fb60e48dff7f450f8e674a0686ae8605e8d9901bd5eefa"
 dependencies = [
- "num-bigint",
- "num-integer",
- "num-traits",
-]
-
-[[package]]
-name = "bigdecimal"
-version = "0.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9324c8014cd04590682b34f1e9448d38f0674d0f7b2dc553331016ef0e4e9ebc"
-dependencies = [
- "autocfg",
- "libm",
  "num-bigint",
  "num-integer",
  "num-traits",
@@ -499,15 +474,6 @@ checksum = "4e2e4afe60d7dd600fdd3de8d0f08c2b7ec039712e3b6137ff98b7004e82de4f"
 dependencies = [
  "alloc-no-stdlib",
  "alloc-stdlib",
-]
-
-[[package]]
-name = "btoi"
-version = "0.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9dd6407f73a9b8b6162d8a2ef999fe6afd7cc15902ebf42c5cd296addf17e0ad"
-dependencies = [
- "num-traits",
 ]
 
 [[package]]
@@ -1132,10 +1098,6 @@ name = "hashbrown"
 version = "0.14.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
-dependencies = [
- "ahash 0.8.11",
- "allocator-api2",
-]
 
 [[package]]
 name = "heck"
@@ -1400,12 +1362,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "libm"
-version = "0.2.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4ec2a862134d2a7d32d7983ddcdd1c4923530833c9f2ea1a44fc5fa473989058"
-
-[[package]]
 name = "libz-sys"
 version = "1.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1465,15 +1421,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lru"
-version = "0.12.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3262e75e648fce39813cb56ac41f3c3e3f65217ebf3844d818d1f9398cfb0dc"
-dependencies = [
- "hashbrown 0.14.5",
-]
-
-[[package]]
 name = "matchers"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1504,7 +1451,7 @@ dependencies = [
  "getopts",
  "hex",
  "log",
- "mysql 24.0.0",
+ "mysql",
  "redis",
  "serde",
  "serde_json",
@@ -1527,9 +1474,6 @@ dependencies = [
 [[package]]
 name = "min-auth-database"
 version = "3.0.0"
-dependencies = [
- "mysql 25.0.0",
-]
 
 [[package]]
 name = "min-auth-web"
@@ -1574,38 +1518,12 @@ dependencies = [
  "flate2",
  "io-enum",
  "libc",
- "lru 0.10.1",
- "mysql_common 0.30.6",
+ "lru",
+ "mysql_common",
  "named_pipe",
  "native-tls",
  "once_cell",
- "pem 2.0.1",
- "percent-encoding",
- "serde",
- "serde_json",
- "socket2 0.5.7",
- "twox-hash",
- "url",
-]
-
-[[package]]
-name = "mysql"
-version = "25.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4cc09a8118051e4617886c9c6e693c61444c2eeb5f9a792dc5d631501706565"
-dependencies = [
- "bufstream",
- "bytes",
- "crossbeam",
- "flate2",
- "io-enum",
- "libc",
- "lru 0.12.3",
- "mysql_common 0.32.2",
- "named_pipe",
- "native-tls",
- "once_cell",
- "pem 3.0.4",
+ "pem",
  "percent-encoding",
  "serde",
  "serde_json",
@@ -1633,31 +1551,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "mysql-common-derive"
-version = "0.31.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "afe0450cc9344afff34915f8328600ab5ae19260802a334d0f72d2d5bdda3bfe"
-dependencies = [
- "darling",
- "heck",
- "num-bigint",
- "proc-macro-crate 3.1.0",
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn 2.0.60",
- "termcolor",
- "thiserror",
-]
-
-[[package]]
 name = "mysql_common"
 version = "0.30.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "57349d5a326b437989b6ee4dc8f2f34b0cc131202748414712a8e7d98952fc8c"
 dependencies = [
- "base64 0.21.7",
- "bigdecimal 0.3.1",
+ "base64",
+ "bigdecimal",
  "bindgen",
  "bitflags 2.5.0",
  "bitvec",
@@ -1670,7 +1570,7 @@ dependencies = [
  "frunk",
  "lazy_static",
  "lexical",
- "mysql-common-derive 0.30.2",
+ "mysql-common-derive",
  "num-bigint",
  "num-traits",
  "rand",
@@ -1686,45 +1586,6 @@ dependencies = [
  "thiserror",
  "time",
  "uuid",
-]
-
-[[package]]
-name = "mysql_common"
-version = "0.32.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ccdc1fe2bb3ef97e07ba4397327ed45509a1e2e499e2f8265243879cbc7313c"
-dependencies = [
- "base64 0.21.7",
- "bigdecimal 0.4.3",
- "bindgen",
- "bitflags 2.5.0",
- "bitvec",
- "btoi",
- "byteorder",
- "bytes",
- "cc",
- "cmake",
- "crc32fast",
- "flate2",
- "frunk",
- "lazy_static",
- "mysql-common-derive 0.31.1",
- "num-bigint",
- "num-traits",
- "rand",
- "regex",
- "rust_decimal",
- "saturating",
- "serde",
- "serde_json",
- "sha1",
- "sha2",
- "smallvec",
- "subprocess",
- "thiserror",
- "time",
- "uuid",
- "zstd",
 ]
 
 [[package]]
@@ -1909,17 +1770,7 @@ version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b13fe415cdf3c8e44518e18a7c95a13431d9bdf6d15367d82b23c377fdd441a"
 dependencies = [
- "base64 0.21.7",
- "serde",
-]
-
-[[package]]
-name = "pem"
-version = "3.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e459365e590736a54c3fa561947c84837534b8e9af6fc5bf781307e82658fae"
-dependencies = [
- "base64 0.22.1",
+ "base64",
  "serde",
 ]
 

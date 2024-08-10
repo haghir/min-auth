@@ -7,8 +7,6 @@ CREATE TABLE `users` (
     `id`            CHAR(24)            CHARSET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY
 ,   `username`      VARCHAR(191)        UNIQUE   -- sets null if the user get to be removed.
 ,   `email`         VARCHAR(191)        NOT NULL
-,   `first_name`    VARCHAR(191)        NOT NULL
-,   `surname`       VARCHAR(191)
 ,   `salt`          VARCHAR(191)        NOT NULL
 ,   `pwhash`        CHAR(64)            NOT NULL
 ,   `pubkey`        CHAR(40)            NOT NULL -- the latest public key fingerprint.
@@ -58,8 +56,6 @@ CREATE TABLE `new_user_requests` (
     `id`            CHAR(24)            CHARSET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY
 ,   `username`      VARCHAR(191)        UNIQUE   -- sets null if the user get to be removed.
 ,   `email`         VARCHAR(191)        NOT NULL
-,   `first_name`    VARCHAR(191)        NOT NULL
-,   `surname`       VARCHAR(191)
 ,   `pubkey`        BLOB                NOT NULL -- the latest public key.
 ,   `created_by`    CHAR(24)            NOT NULL
 ,   `created_at`    DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP
