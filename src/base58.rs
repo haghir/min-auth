@@ -3,7 +3,7 @@ use itertools::Itertools;
 const CHR: &'static [u8] = b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 // based on https://github.com/trezor/trezor-crypto/blob/master/base58.c
-pub(crate) fn to_base58(data: &[u8]) -> String {
+pub fn to_base58(data: &[u8]) -> String {
     let base = CHR.len() as u32;
     let zcount = data.iter().take_while(|x| **x == 0).count();
     let slen = data.len();

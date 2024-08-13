@@ -1,12 +1,14 @@
 use getopts::Options;
-use mysql::{prelude::*, Opts, OptsBuilder, Conn};
+use futures_util::StreamExt;
+use mysql_async::{prelude::*, Opts, OptsBuilder, Conn};
 use redis::{Client as RedisClient, Commands};
 use std::env;
 use log::{info, debug};
 
-use min_auth_auth::{Config, Credential};
+use min_auth::{Config, Credential};
 
-fn main() {
+#[tokio::main]
+async fn main() {
     env_logger::init();
 
     // Parses command line arguments.
@@ -22,27 +24,23 @@ fn main() {
 
     // Initializes a MySQL client.
     let mysql_opts: Opts = OptsBuilder::default()
-        .ip_or_hostname(Some(config.mysql.hostname))
+        .ip_or_hostname(config.mysql.hostname)
         .tcp_port(config.mysql.port)
         .user(Some(config.mysql.username))
         .pass(Some(config.mysql.password))
         .db_name(Some(config.mysql.database))
         .into();
-    let mut mysql_conn = Conn::new(mysql_opts).unwrap();
+    let mut mysql_conn = Conn::new(mysql_opts).await.unwrap();
 
     // Initializes a Redis client.
     let mut redis_conn = RedisClient::open(config.redis.uri.as_str()).unwrap();
 
     // Copy all credentials in the MySQL database to the Redis server.
     let sql = "SELECT id, salt, pwhash FROM credentials";
-    for row in mysql_conn.query_iter(sql).unwrap() {
-        let row = row.unwrap();
-        let cred = Credential {
-            id: row.get(0).unwrap(),
-            salt: row.get(1).unwrap(),
-            pwhash: row.get(2).unwrap(),
-        };
-
+    let mut result = mysql_conn.query_iter(sql).await.unwrap();
+    let mut stream = result.stream::<Credential>().await.unwrap().unwrap();
+    while let Some(cred) = stream.next().await {
+        let cred = cred.unwrap();
         let id: &str = cred.id.as_str();
         let json: String = (&cred).into();
         let lt = config.redis.lifetime;

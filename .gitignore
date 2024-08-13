@@ -7,11 +7,6 @@
 # Rust
 /target
 
-# Generated files
-/min-auth-monitor
-/config.toml.default
-/min-auth@.service
-
 # Created by https://www.toptal.com/developers/gitignore/api/autotools
 # Edit at https://www.toptal.com/developers/gitignore?templates=autotools
 

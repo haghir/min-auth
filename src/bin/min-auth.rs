@@ -5,7 +5,7 @@ use redis::{Client as RedisClient, AsyncCommands};
 use std::{env, sync::Mutex};
 use log::{info, debug};
 
-use min_auth_auth::{Config, Credential};
+use min_auth::{Config, Credential};
 
 struct WebContext {
     // Redis client
@@ -24,7 +24,7 @@ async fn verify(
 ) -> bool {
     // Retrieves an async connection of Redis.
     let redconn = web_ctx.redis.as_mut().unwrap();
-    let mut redconn = redconn.get_async_connection().await.unwrap();
+    let mut redconn = redconn.get_multiplexed_async_connection().await.unwrap();
 
     if let Ok(cached) = redconn.get::<&str, String>(user_id).await {
         debug!("{}", cached);

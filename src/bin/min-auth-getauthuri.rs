@@ -1,7 +1,7 @@
 use getopts::Options;
 use std::env;
 
-use min_auth_auth::Config;
+use min_auth::Config;
 
 fn main() {
     env_logger::init();

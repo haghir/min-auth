@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.71])
-AC_INIT([min-auth], [2.0.0], [])
+AC_INIT([min-auth], [3.0.0], [])
 AM_INIT_AUTOMAKE([foreign])
 
 # Checks for programs.
@@ -17,5 +17,15 @@ AS_IF([test x"$CARGO_FOUND" != x"yes"], AC_MSG_ERROR(['cargo' is not found.]))
 
 # Checks for library functions.
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([
+Makefile
+etc/Makefile
+etc/min-auth/Makefile
+scripts/Makefile
+share/Makefile
+share/min-auth/Makefile
+share/min-auth/apparmor/Makefile
+share/min-auth/html/Makefile
+share/min-auth/service/Makefile
+])
 AC_OUTPUT
