@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>min-auth</title>
+</head>
+<body>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>E-mail</th>
+        <th colspan="2">operations</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in data -%}
+      <tr>
+        <td>{{ entry.id }}</td>
+        <td>{{ entry.mail }}</td>
+        <td><a href="/edit?id={{ entry.id }}">edit</a></td>
+        <td><a href="/show?id={{ entry.id }}">show</a></td>
+      </tr>
+      {% endfor -%}
+    </tbody>
+  </table>
+</body>
+</html>

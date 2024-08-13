@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ username }}</title>
+</head>
+<body>
+<form action="/register" method="post">
+  <div class="field">
+    <label for="username">Username</label>
+    <div><input id="username" name="username" type="text" value="{{ username }}" required/></div>
+  </div>
+  <div class="field">
+    <label for="email">E-mail</label>
+    <div><input id="email" name="email" type="email" value="{{ email }}" required/></div>
+  </div>
+  <div class="field">
+    <label for="pubkey">Public key</label>
+    <div><input id="pubkey" name="pubkey" type="file"/></div>
+  </div>
+  <div class="operations">
+    <button type="submit">Confirm</button>
+  </div>
+</form>
+</body>
+</html>

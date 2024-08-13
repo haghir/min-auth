@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ username }}</title>
+</head>
+<body>
+  <div class="field">
+    <label>Username</label>
+    <div>{{ username }}</div>
+  </div>
+  <div class="field">
+    <label>E-mail</label>
+    <div>{{ email }}</div>
+  </div>
+  <div class="field">
+    <label>Public key fingerprint</label>
+    <div>{{ pubkey }}</div>
+  </div>
+  <div>
+    <a class="button" href="/edit?id={{ id }}">EDIT</a>
+    <a class="button" href="/delete?id={{ id }}">DELETE</a>
+  </div>
+</body>
+</html>
