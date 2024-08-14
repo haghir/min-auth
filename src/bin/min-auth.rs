@@ -1,19 +1,22 @@
-use actix_web::{web::Data, get, App, HttpServer, HttpResponse, Result};
+use actix_web::{web::Data, get, App, HttpServer, HttpResponse, Result as WebResult};
 use actix_web_httpauth::extractors::basic::BasicAuth;
 use getopts::Options;
-use redis::{Client as RedisClient, AsyncCommands};
+use redis::{Client as RedisClient, AsyncCommands, RedisResult};
 use std::{env, sync::Mutex};
-use log::{info, debug};
+use log::{error, info, debug};
 
-use min_auth::{Config, Credential};
+use min_auth::config::Config;
+use min_auth::credentials::Credential;
+use min_auth::error::Error;
+use min_auth::Result;
 
 struct WebContext {
     // Redis client
     redis: Option<Box<RedisClient>>,
 }
 
-fn new_redis_client(config: &Config) -> Box<RedisClient> {
-    Box::new(RedisClient::open(config.redis.uri.as_str()).unwrap())
+fn new_redis_client(config: &Config) -> RedisResult<Box<RedisClient>> {
+    Ok(Box::new(RedisClient::open(config.redis.uri.as_str())?))
 }
 
 async fn verify(
@@ -21,25 +24,31 @@ async fn verify(
     config: &Config,
     user_id: &str,
     password: &str
-) -> bool {
+) -> Result<bool> {
     // Retrieves an async connection of Redis.
-    let redconn = web_ctx.redis.as_mut().unwrap();
-    let mut redconn = redconn.get_multiplexed_async_connection().await.unwrap();
+    let redconn = match web_ctx.redis.as_mut() {
+        Some(c) => c,
+        None => return Err(Error::new("No redis client was found.")),
+    };
+    let mut redconn = redconn.get_multiplexed_async_connection().await?;
 
     if let Ok(cached) = redconn.get::<&str, String>(user_id).await {
         debug!("{}", cached);
 
-        let cred: Credential = (&cached).try_into().unwrap();
-        if cred.verify(&config.minauth.password_secret, password) {
-            info!("{} was authenticated.", user_id);
-            true
+        if let Ok(cred) = <&String as TryInto<Credential>>::try_into(&cached) {
+            if cred.verify(&config.minauth.password_secret, password) {
+                info!("{} was authenticated.", user_id);
+                Ok(true)
+            } else {
+                info!("Failed to authenticate {}.", user_id);
+                Ok(false)
+            }
         } else {
-            info!("Failed to authenticate {}.", user_id);
-            false
+            Err("Failed to convert the serialized string into Credential.".into())
         }
     } else {
         info!("{}'s credential information is not found.", user_id);
-        false
+        Ok(false)
     }
 }
 
@@ -48,14 +57,24 @@ async fn auth(
     web_ctx: Data<Mutex<WebContext>>,
     config: Data<Config>,
     auth: BasicAuth
-) -> Result<HttpResponse> {
-    let mut web_ctx = web_ctx.lock().unwrap();
+) -> WebResult<HttpResponse> {
+    let mut web_ctx = match web_ctx.lock() {
+        Ok(v) => v,
+        Err(e) => {
+            error!("{}", e);
+            return Ok(HttpResponse::InternalServerError().finish());
+        },
+    };
 
     if let Some(password) = auth.password() {
-        if verify(&mut web_ctx, &(**config), auth.user_id(), password).await {
-            Ok(HttpResponse::Ok().finish())
+        if let Ok(ret) = verify(&mut web_ctx, &(**config), auth.user_id(), password).await {
+            if ret {
+                Ok(HttpResponse::Ok().finish())
+            } else {
+                Ok(HttpResponse::Forbidden().finish())
+            }
         } else {
-            Ok(HttpResponse::Forbidden().finish())
+            Ok(HttpResponse::InternalServerError().finish())
         }
     } else {
         Ok(HttpResponse::Forbidden().finish())
@@ -63,7 +82,7 @@ async fn auth(
 }
 
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> Result<()> {
     env_logger::init();
 
     // Parses command line arguments.
@@ -71,19 +90,25 @@ async fn main() -> std::io::Result<()> {
     let mut opts = Options::new();
     opts.optopt("c", "config", "path to a config file", "CONFIG");
     opts.optopt("p", "port", "port number", "PORT");
-    let matches = opts.parse(&args[1..]).unwrap();
-    let config_path = matches.opt_str("c").unwrap();
-    let port = matches.opt_str("p").unwrap();
+    let matches = opts.parse(&args[1..])?;
+    let config_path = match matches.opt_str("c") {
+        Some(v) => v,
+        None => return Err("No config path was specified.".into())
+    };
+    let port = match matches.opt_str("p") {
+        Some(v) => v,
+        None => return Err("No port was specified.".into()),
+    };
 
-    // Laods a configuration file.
-    let config: String = std::fs::read_to_string(config_path).unwrap();
-    let config: Config = (&config).try_into().unwrap();
+    // Loads a configuration file.
+    let config: String = std::fs::read_to_string(config_path)?;
+    let config: Config = (&config).try_into()?;
     let config = Data::new(config);
     let expose = format!("{}:{}", config.minauth.hostname, port);
 
     // Creates a web context.
     let web_ctx = Data::new(Mutex::new(WebContext {
-        redis: Some(new_redis_client(&config)),
+        redis: Some(new_redis_client(&config)?),
     }));
 
     // Starts a web server.
@@ -95,5 +120,7 @@ async fn main() -> std::io::Result<()> {
     })
         .bind(expose.as_str())?
         .run()
-        .await
+        .await?;
+
+    Ok(())
 }

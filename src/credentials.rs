@@ -4,6 +4,7 @@ use sha2::{Sha256, Digest};
 use log::debug;
 use mysql_async::prelude::FromRow;
 use mysql_async::{FromRowError, Row};
+use crate::utils::get_from_row;
 
 #[derive(Serialize, Deserialize)]
 pub struct Credential {
@@ -52,11 +53,11 @@ pub fn get_hash(password: &str) -> String {
 }
 
 impl FromRow for Credential {
-    fn from_row_opt(mut row: Row) -> Result<Self, FromRowError> {
+    fn from_row_opt(row: Row) -> Result<Self, FromRowError> {
         Ok(Credential {
-            id: row.take(0).unwrap(),
-            salt: row.take(1).unwrap(),
-            pwhash: row.take(2).unwrap(),
+            id: get_from_row(&row, 0)?,
+            salt: get_from_row(&row, 1)?,
+            pwhash: get_from_row(&row, 2)?,
         })
     }
 }

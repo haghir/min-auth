@@ -1,6 +1,7 @@
 use mysql_async::prelude::FromRow;
 use mysql_async::{FromRowError, Row};
 use time::PrimitiveDateTime;
+use crate::utils::get_from_row;
 
 pub struct Request {
     pub id: String,
@@ -49,16 +50,16 @@ pub struct PasswordResetRequest {
 impl FromRow for Request {
     fn from_row_opt(row: Row) -> Result<Self, FromRowError> {
         Ok(Request {
-            id: row.get(0).unwrap(),
-            issuer_id: row.get(1).unwrap(),
-            request_type: row.get(2).unwrap(),
-            status: row.get(3).unwrap(),
-            proc_id: row.get(4),
+            id: get_from_row(&row, 0)?,
+            issuer_id: get_from_row(&row, 1)?,
+            request_type: get_from_row(&row, 2)?,
+            status: get_from_row(&row, 3)?,
+            proc_id: get_from_row(&row, 4)?,
             description: row.get(5),
-            created_by: row.get(6).unwrap(),
-            created_at: row.get(7).unwrap(),
-            updated_by: row.get(8).unwrap(),
-            updated_at: row.get(9).unwrap(),
+            created_by: get_from_row(&row, 6)?,
+            created_at: get_from_row(&row, 7)?,
+            updated_by: get_from_row(&row, 8)?,
+            updated_at: get_from_row(&row, 9)?,
         })
     }
 }
@@ -66,10 +67,10 @@ impl FromRow for Request {
 impl FromRow for RequestTicket {
     fn from_row_opt(row: Row) -> Result<Self, FromRowError> {
         Ok(RequestTicket {
-            id: row.get(0).unwrap(),
-            rnd: row.get(1).unwrap(),
-            created_by: row.get(2).unwrap(),
-            created_at: row.get(3).unwrap(),
+            id: get_from_row(&row, 0)?,
+            rnd: get_from_row(&row, 1)?,
+            created_by: get_from_row(&row, 2)?,
+            created_at: get_from_row(&row, 3)?,
         })
     }
 }
@@ -77,12 +78,12 @@ impl FromRow for RequestTicket {
 impl FromRow for NewUserRequest {
     fn from_row_opt(row: Row) -> Result<Self, FromRowError> {
         Ok(NewUserRequest {
-            id: row.get(0).unwrap(),
-            username: row.get(1),
-            email: row.get(2).unwrap(),
-            pubkey: row.get(3).unwrap(),
-            created_by: row.get(4).unwrap(),
-            created_at: row.get(5).unwrap(),
+            id: get_from_row(&row, 0)?,
+            username: get_from_row(&row, 1)?,
+            email: get_from_row(&row, 2)?,
+            pubkey: get_from_row(&row, 3)?,
+            created_by: get_from_row(&row, 4)?,
+            created_at: get_from_row(&row, 5)?,
         })
     }
 }
@@ -90,11 +91,11 @@ impl FromRow for NewUserRequest {
 impl FromRow for ChangingPubkeyRequest {
     fn from_row_opt(row: Row) -> Result<Self, FromRowError> {
         Ok(ChangingPubkeyRequest {
-            id: row.get(0).unwrap(),
-            user_id: row.get(1).unwrap(),
-            pubkey: row.get(2).unwrap(),
-            created_by: row.get(3).unwrap(),
-            created_at: row.get(4).unwrap(),
+            id: get_from_row(&row, 0)?,
+            user_id: get_from_row(&row, 1)?,
+            pubkey: get_from_row(&row, 2)?,
+            created_by: get_from_row(&row, 3)?,
+            created_at: get_from_row(&row, 4)?,
         })
     }
 }
@@ -102,10 +103,10 @@ impl FromRow for ChangingPubkeyRequest {
 impl FromRow for PasswordResetRequest {
     fn from_row_opt(row: Row) -> Result<Self, FromRowError> {
         Ok(PasswordResetRequest {
-            id: row.get(0).unwrap(),
-            user_id: row.get(1).unwrap(),
-            created_by: row.get(2).unwrap(),
-            created_at: row.get(3).unwrap(),
+            id: get_from_row(&row, 0)?,
+            user_id: get_from_row(&row, 1)?,
+            created_by: get_from_row(&row, 2)?,
+            created_at: get_from_row(&row, 3)?,
         })
     }
 }

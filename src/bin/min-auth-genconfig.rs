@@ -1,6 +1,7 @@
-use min_auth::{Config, MinAuthConfig, MySQLConfig, RedisConfig};
+use min_auth::config::{Config, MinAuthConfig, MySQLConfig, RedisConfig};
+use min_auth::Result;
 
-fn main() {
+fn main() -> Result<()> {
     let config = Config {
         minauth: MinAuthConfig {
             hostname: "127.0.0.1".to_string(),
@@ -19,6 +20,11 @@ fn main() {
         },
     };
 
-    let toml: String = (&config).try_into().unwrap();
+    let toml: String = match <&Config as TryInto<String>>::try_into(&config) {
+        Ok(v) => v,
+        Err(e) => return Err(e.to_string().into())
+    };
     print!("{}", toml);
+
+    Ok(())
 }

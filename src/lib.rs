@@ -1,13 +1,10 @@
-mod base58;
-mod config;
-mod credentials;
-mod genid;
-mod requests;
-mod threadid;
+pub mod base58;
+pub mod config;
+pub mod credentials;
+pub mod error;
+pub mod genid;
+pub mod requests;
+pub mod threadid;
+pub mod utils;
 
-pub use base58::*;
-pub use config::*;
-pub use credentials::*;
-pub use genid::*;
-pub use requests::*;
-pub use threadid::*;
+pub type Result<T> = std::result::Result<T, error::Error>;
