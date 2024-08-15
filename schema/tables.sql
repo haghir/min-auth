@@ -33,7 +33,7 @@ CREATE TABLE `service_users` (
 CREATE TABLE `requests` (
     `id`            CHAR(24)            CHARSET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY
 ,   `issuer_id`     CHAR(24)            CHARSET ascii COLLATE ascii_bin NOT NULL
-,   `type`          VARCHAR(191)        NOT NULL
+,   `type`          TINYINT             NOT NULL -- refs. common/src/requests.rs
 ,   `status`        TINYINT             NOT NULL -- 0: new, 1: in progress, 2: succeeded, <0: error code
 ,   `proc_id`       CHAR(24)            CHARSET ascii COLLATE ascii_bin
 ,   `description`   TEXT
@@ -45,7 +45,7 @@ CREATE TABLE `requests` (
 ,   INDEX (`proc_id`)
 );
 
-CREATE TABLE `new_user_requests` (
+CREATE TABLE `create_user_requests` (
     `id`            CHAR(24)            CHARSET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY
 ,   `username`      VARCHAR(191)        UNIQUE   -- sets null if the user get to be removed.
 ,   `email`         VARCHAR(191)        NOT NULL
@@ -55,7 +55,7 @@ CREATE TABLE `new_user_requests` (
 ,   FOREIGN KEY (`id`) REFERENCES `requests` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
-CREATE TABLE `changing_pubkey_requests` (
+CREATE TABLE `change_pubkey_requests` (
     `id`            CHAR(24)            CHARSET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY
 ,   `user_id`       CHAR(24)            CHARSET ascii COLLATE ascii_bin NOT NULL
 ,   `pubkey`        BLOB                NOT NULL -- the latest public key.
@@ -64,19 +64,9 @@ CREATE TABLE `changing_pubkey_requests` (
 ,   FOREIGN KEY (`id`) REFERENCES `requests` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
-CREATE TABLE `password_reset_requests` (
+CREATE TABLE `renew_password_requests` (
     `id`            CHAR(24)            CHARSET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY
 ,   `user_id`       CHAR(24)            CHARSET ascii COLLATE ascii_bin NOT NULL
-,   `created_by`    CHAR(24)            NOT NULL
-,   `created_at`    DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP
-,   FOREIGN KEY (`id`) REFERENCES `requests` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-);
-
-CREATE TABLE `sending_email_requests` (
-    `id`            CHAR(24)            CHARSET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY
-,   `user_id`       CHAR(24)            CHARSET ascii COLLATE ascii_bin NOT NULL
-,   `subject`       TEXT                NOT NULL
-,   `body`          LONGTEXT            NOT NULL
 ,   `created_by`    CHAR(24)            NOT NULL
 ,   `created_at`    DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP
 ,   FOREIGN KEY (`id`) REFERENCES `requests` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT

@@ -7,65 +7,37 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e6ffe9b2-1db8-4067-bf8f-a23a17818695" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/min-auth.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/min-auth.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Makefile.am" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/autogen.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/configure.ac" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/etc/Makefile.am" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/etc/min-auth/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/etc/min-auth/Makefile.am" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Makefile.am" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/min-auth-monitor.t" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/share/Makefile.am" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/share/min-auth/Makefile.am" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/share/min-auth/apparmor/Makefile.am" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/share/min-auth/html/Makefile.am" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/share/min-auth/html/confirm.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/share/min-auth/html/delete.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/share/min-auth/html/edit.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/share/min-auth/html/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/share/min-auth/html/requests.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/share/min-auth/html/show.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/share/min-auth/service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/share/min-auth/service/Makefile.am" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/share/min-auth/service/min-auth@.service.t" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/base58.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/bin/min-auth-fetch-requests.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/bin/min-auth-genconfig.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/bin/min-auth-getauthuri.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/bin/min-auth-loader.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/bin/min-auth.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/config.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/credentials.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/error.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genid.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/requests.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/threadid.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils.rs" beforeDir="false" />
+    <list default="true" id="c82446b1-71c7-4b15-967f-3afbbc06a30b" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/background/src/bin/min-auth-dispatch.rs" beforeDir="false" afterPath="$PROJECT_DIR$/background/src/bin/min-auth-dispatch.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/background/src/bin/min-auth-genconfig.rs" beforeDir="false" afterPath="$PROJECT_DIR$/background/src/bin/min-auth-genconfig.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/config.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/requests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/requests.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/min-auth.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/schema/tables.sql" beforeDir="false" afterPath="$PROJECT_DIR$/schema/tables.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Rust File" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MacroExpansionManager">
-    <option name="directoryName" value="rca1wt6l" />
+    <option name="directoryName" value="uuc9z4ai" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 8
-}]]></component>
-  <component name="ProjectId" id="2kgDiJxl5eRUp2DT7XPmFhDVkKB" />
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2kgjMgDqCiYzAVuTP9lLfbc0mRr" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
@@ -73,33 +45,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.rust.reset.selective.auto.import": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/adam/Projects/min-auth/background/src/bin",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
-    "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
-    "org.rust.first.attach.projects": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Cargo.clean.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.rust.reset.selective.auto.import&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
+    &quot;org.rust.first.attach.projects&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/background/src/bin" />
-      <recent name="$PROJECT_DIR$/background/etc/min-auth" />
-      <recent name="$PROJECT_DIR$/background" />
-      <recent name="$PROJECT_DIR$/background/share/min-auth/apparmor" />
-      <recent name="$PROJECT_DIR$/background/share/min-auth/service" />
-    </key>
-  </component>
+}</component>
   <component name="RunManager" selected="Cargo.Test min-auth">
-    <configuration name="Run min-auth-fetch-requests" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-      <option name="command" value="run --package min-auth-background --bin min-auth-fetch-requests" />
+    <configuration name="Run min-auth-dispatch" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="command" value="run --package min-auth-background --bin min-auth-dispatch" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -173,12 +134,15 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="e6ffe9b2-1db8-4067-bf8f-a23a17818695" name="Changes" comment="" />
-      <created>1723696451723</created>
+      <changelist id="c82446b1-71c7-4b15-967f-3afbbc06a30b" name="Changes" comment="" />
+      <created>1723712068043</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1723696451723</updated>
-      <workItem from="1723696453030" duration="9969000" />
+      <updated>1723712068043</updated>
+      <workItem from="1723712069088" duration="9799000" />
+      <workItem from="1723730469755" duration="584000" />
+      <workItem from="1723731130476" duration="174000" />
+      <workItem from="1723732189772" duration="2041000" />
     </task>
     <servers />
   </component>

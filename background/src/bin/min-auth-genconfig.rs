@@ -13,6 +13,7 @@ fn main() -> Result<()> {
         .ok_or(Error::from("No prefix was specified."))?;
 
     let config = BackgroundConfig {
+        workers: 8,
         requests_dir: format!("{}/var/min-auth/requests", prefix),
         workspace_dir: format!("{}/var/min-auth/workspace", prefix),
         mysql: MySQLConfig {

@@ -19,6 +19,7 @@ pub struct WebConfig {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct BackgroundConfig {
+    pub workers: u64,
     pub requests_dir: String,
     pub workspace_dir: String,
     pub mysql: MySQLConfig,

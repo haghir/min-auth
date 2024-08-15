@@ -1,29 +1,67 @@
-use mysql_async::prelude::FromRow;
-use mysql_async::{FromRowError, Row};
+use mysql_async::prelude::*;
+use mysql_async::{FromRowError, FromValueError, Row, Value};
 use time::PrimitiveDateTime;
 use crate::utils::get_from_row;
+
+// ===================================================================
+// Values
+// ===================================================================
+
+pub enum RequestType {
+    CreateUserRequest,
+    ChangePubkeyRequest,
+    RenewPasswordRequest,
+}
+
+impl Into<Value> for RequestType {
+    fn into(self) -> Value {
+        match self {
+            RequestType::CreateUserRequest => Value::Int(1),
+            RequestType::ChangePubkeyRequest => Value::Int(2),
+            RequestType::RenewPasswordRequest => Value::Int(3),
+        }
+    }
+}
+
+impl TryFrom<Value> for RequestType {
+    type Error = FromValueError;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Int(code) => match code {
+                1 => Ok(RequestType::CreateUserRequest),
+                2 => Ok(RequestType::ChangePubkeyRequest),
+                3 => Ok(RequestType::RenewPasswordRequest),
+                _ => Err(FromValueError(value))
+            },
+            _ => Err(FromValueError(value)),
+        }
+    }
+}
+
+impl FromValue for RequestType {
+    type Intermediate = RequestType;
+}
+
+// ===================================================================
+// Entities
+// ===================================================================
 
 pub struct Request {
     pub id: String,
     pub issuer_id: String,
-    pub request_type: String,
+    pub request_type: RequestType,
     pub status: i8,
     pub proc_id: Option<String>,
     pub description: Option<String>,
-    pub rand: u32,
+    pub rand: u64,
     pub created_by: String,
     pub created_at: PrimitiveDateTime,
     pub updated_by: String,
     pub updated_at: PrimitiveDateTime,
 }
 
-pub struct RequestTicket {
-    pub id: String,
-    pub created_by: String,
-    pub created_at: PrimitiveDateTime,
-}
-
-pub struct NewUserRequest {
+pub struct CreateUserRequest {
     pub id: String,
     pub username: Option<String>,
     pub email: String,
@@ -32,7 +70,7 @@ pub struct NewUserRequest {
     pub created_at: PrimitiveDateTime,
 }
 
-pub struct ChangingPubkeyRequest {
+pub struct ChangePubkeyRequest {
     pub id: String,
     pub user_id: String,
     pub pubkey: Vec<u8>,
@@ -40,7 +78,7 @@ pub struct ChangingPubkeyRequest {
     pub created_at: PrimitiveDateTime,
 }
 
-pub struct PasswordResetRequest {
+pub struct RenewPasswordRequest {
     pub id: String,
     pub user_id: String,
     pub created_by: String,
@@ -65,9 +103,9 @@ impl FromRow for Request {
     }
 }
 
-impl FromRow for NewUserRequest {
+impl FromRow for CreateUserRequest {
     fn from_row_opt(row: Row) -> Result<Self, FromRowError> {
-        Ok(NewUserRequest {
+        Ok(CreateUserRequest {
             id: get_from_row(&row, 0)?,
             username: get_from_row(&row, 1)?,
             email: get_from_row(&row, 2)?,
@@ -78,9 +116,9 @@ impl FromRow for NewUserRequest {
     }
 }
 
-impl FromRow for ChangingPubkeyRequest {
+impl FromRow for ChangePubkeyRequest {
     fn from_row_opt(row: Row) -> Result<Self, FromRowError> {
-        Ok(ChangingPubkeyRequest {
+        Ok(ChangePubkeyRequest {
             id: get_from_row(&row, 0)?,
             user_id: get_from_row(&row, 1)?,
             pubkey: get_from_row(&row, 2)?,
@@ -90,9 +128,9 @@ impl FromRow for ChangingPubkeyRequest {
     }
 }
 
-impl FromRow for PasswordResetRequest {
+impl FromRow for RenewPasswordRequest {
     fn from_row_opt(row: Row) -> Result<Self, FromRowError> {
-        Ok(PasswordResetRequest {
+        Ok(RenewPasswordRequest {
             id: get_from_row(&row, 0)?,
             user_id: get_from_row(&row, 1)?,
             created_by: get_from_row(&row, 2)?,
