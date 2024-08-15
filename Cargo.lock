@@ -554,12 +554,13 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.1.10"
+version = "1.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e9e8aabfac534be767c909e0690571677d49f41bd8465ae876fe043d52ba5292"
+checksum = "5fb8dd288a69fc53a1996d7ecfbf4a20d59065bff137ce7e56bbd620de191189"
 dependencies = [
  "jobserver",
  "libc",
+ "shlex",
 ]
 
 [[package]]
@@ -1198,9 +1199,9 @@ checksum = "206ca75c9c03ba3d4ace2460e57b189f39f43de612c2f85836e65c929701bb2d"
 
 [[package]]
 name = "indexmap"
-version = "2.3.0"
+version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "de3fc2e30ba82dd1b3911c8de1ffc143c74a914a14e99514d7637e3099df5ea0"
+checksum = "93ead53efc7ea8ed3cfb0c79fc8023fbb782a5432b52830b6518941cebe6505c"
 dependencies = [
  "equivalent",
  "hashbrown 0.14.5",
@@ -1384,13 +1385,40 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a"
 
 [[package]]
-name = "min-auth"
+name = "min-auth-auth"
 version = "3.0.0"
 dependencies = [
  "actix-web",
  "actix-web-httpauth",
- "chrono",
  "env_logger",
+ "futures-util",
+ "getopts",
+ "log",
+ "min-auth-common",
+ "mysql_async",
+ "redis",
+ "serde",
+ "serde_json",
+ "tokio",
+ "toml",
+]
+
+[[package]]
+name = "min-auth-background"
+version = "3.0.0"
+dependencies = [
+ "env_logger",
+ "getopts",
+ "min-auth-common",
+ "mysql_async",
+ "tokio",
+]
+
+[[package]]
+name = "min-auth-common"
+version = "3.0.0"
+dependencies = [
+ "chrono",
  "futures-util",
  "getopts",
  "hex",
@@ -1407,6 +1435,13 @@ dependencies = [
  "time",
  "tokio",
  "toml",
+]
+
+[[package]]
+name = "min-auth-web"
+version = "3.0.0"
+dependencies = [
+ "min-auth-common",
 ]
 
 [[package]]
