@@ -89,3 +89,12 @@ impl From<mysql_async::Error> for Error {
         }
     }
 }
+
+impl From<std::num::ParseIntError> for Error {
+    fn from(value: std::num::ParseIntError) -> Self {
+        Self {
+            source: "std::num::ParseIntError",
+            message: value.to_string(),
+        }
+    }
+}

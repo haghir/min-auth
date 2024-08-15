@@ -12,3 +12,7 @@ target/release/min-auth: Makefile $(RS)
 
 target/release/min-auth-getauthuri: Makefile $(RS)
 	cargo build --release
+
+install-data-hook:
+	mkdir -p "$(prefix)/var/tickets"
+	mkdir -p "$(prefix)/var/requests"

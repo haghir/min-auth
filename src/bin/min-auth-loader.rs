@@ -1,29 +1,33 @@
+use std::env;
 use futures_util::StreamExt;
-use mysql_async::{prelude::*, Opts, OptsBuilder, Conn};
+use getopts::Options;
+use mysql_async::{prelude::*, Opts, Conn};
 use redis::{Client as RedisClient, Commands};
 use log::{info, debug};
 
 use min_auth::config::Config;
 use min_auth::credentials::Credential;
 use min_auth::error::Error;
-use min_auth::utils::load_config_from_args;
 use min_auth::Result;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     env_logger::init();
 
+    // Parses command line arguments.
+    let args: Vec<String> = env::args().collect();
+    let mut opts = Options::new();
+    opts.optopt("c", "config", "path to config file", "CONFIG");
+    let matches = opts.parse(&args[1..])?;
+    let config_path = matches.opt_str("c")
+        .ok_or(Error::from("No config path was specified."))?;
+
     // Loads a configuration file.
-    let config: Config = load_config_from_args()?;
+    let config: String = std::fs::read_to_string(config_path)?;
+    let config = <&String as TryInto<Config>>::try_into(&config)?;
 
     // Initializes a MySQL client.
-    let mysql_opts: Opts = OptsBuilder::default()
-        .ip_or_hostname(config.mysql.hostname)
-        .tcp_port(config.mysql.port)
-        .user(Some(config.mysql.username))
-        .pass(Some(config.mysql.password))
-        .db_name(Some(config.mysql.database))
-        .into();
+    let mysql_opts: Opts = (&config).into();
     let mut mysql_conn = Conn::new(mysql_opts).await?;
 
     // Initializes a Redis client.

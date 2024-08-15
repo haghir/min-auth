@@ -10,6 +10,7 @@ pub struct Request {
     pub status: i8,
     pub proc_id: Option<String>,
     pub description: Option<String>,
+    pub rand: u32,
     pub created_by: String,
     pub created_at: PrimitiveDateTime,
     pub updated_by: String,
@@ -18,7 +19,6 @@ pub struct Request {
 
 pub struct RequestTicket {
     pub id: String,
-    pub rnd: u32,
     pub created_by: String,
     pub created_at: PrimitiveDateTime,
 }
@@ -56,21 +56,11 @@ impl FromRow for Request {
             status: get_from_row(&row, 3)?,
             proc_id: get_from_row(&row, 4)?,
             description: row.get(5),
-            created_by: get_from_row(&row, 6)?,
-            created_at: get_from_row(&row, 7)?,
-            updated_by: get_from_row(&row, 8)?,
-            updated_at: get_from_row(&row, 9)?,
-        })
-    }
-}
-
-impl FromRow for RequestTicket {
-    fn from_row_opt(row: Row) -> Result<Self, FromRowError> {
-        Ok(RequestTicket {
-            id: get_from_row(&row, 0)?,
-            rnd: get_from_row(&row, 1)?,
-            created_by: get_from_row(&row, 2)?,
-            created_at: get_from_row(&row, 3)?,
+            rand: get_from_row(&row, 6)?,
+            created_by: get_from_row(&row, 7)?,
+            created_at: get_from_row(&row, 8)?,
+            updated_by: get_from_row(&row, 9)?,
+            updated_at: get_from_row(&row, 10)?,
         })
     }
 }

@@ -26,10 +26,8 @@ async fn verify(
     password: &str
 ) -> Result<bool> {
     // Retrieves an async connection of Redis.
-    let redconn = match web_ctx.redis.as_mut() {
-        Some(c) => c,
-        None => return Err(Error::new("No redis client was found.")),
-    };
+    let redconn = web_ctx.redis.as_mut()
+        .ok_or(Error::new("No redis client was found."))?;
     let mut redconn = redconn.get_multiplexed_async_connection().await?;
 
     if let Ok(cached) = redconn.get::<&str, String>(user_id).await {
@@ -91,14 +89,10 @@ async fn main() -> Result<()> {
     opts.optopt("c", "config", "path to a config file", "CONFIG");
     opts.optopt("p", "port", "port number", "PORT");
     let matches = opts.parse(&args[1..])?;
-    let config_path = match matches.opt_str("c") {
-        Some(v) => v,
-        None => return Err("No config path was specified.".into())
-    };
-    let port = match matches.opt_str("p") {
-        Some(v) => v,
-        None => return Err("No port was specified.".into()),
-    };
+    let config_path = matches.opt_str("c")
+        .ok_or(Error::from("No config path was specified."))?;
+    let port = matches.opt_str("p")
+        .ok_or(Error::from("No port was specified."))?;
 
     // Loads a configuration file.
     let config: String = std::fs::read_to_string(config_path)?;

@@ -37,19 +37,12 @@ CREATE TABLE `requests` (
 ,   `status`        TINYINT             NOT NULL -- 0: new, 1: in progress, 2: succeeded, <0: error code
 ,   `proc_id`       CHAR(24)            CHARSET ascii COLLATE ascii_bin
 ,   `description`   TEXT
+,   `rand`          INTEGER UNSIGNED    NOT NULL
 ,   `created_by`    CHAR(24)            NOT NULL
 ,   `created_at`    DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP
 ,   `updated_by`    CHAR(24)            NOT NULL
 ,   `updated_at`    DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ,   INDEX (`proc_id`)
-);
-
-CREATE TABLE `request_tickets` (
-    `id`            CHAR(24)            CHARSET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY
-,   `rnd`           INTEGER UNSIGNED    NOT NULL
-,   `created_by`    CHAR(24)            NOT NULL
-,   `created_at`    DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP
-,   FOREIGN KEY (`id`) REFERENCES `requests` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
 CREATE TABLE `new_user_requests` (
