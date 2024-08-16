@@ -4,7 +4,7 @@ use time::PrimitiveDateTime;
 use crate::utils::get_from_row;
 
 // ===================================================================
-// Values
+// Request Type
 // ===================================================================
 
 pub enum RequestType {
@@ -44,45 +44,67 @@ impl FromValue for RequestType {
 }
 
 // ===================================================================
-// Entities
+// Request Status
+// ===================================================================
+
+pub enum RequestStatus {
+    New,
+    InProgress,
+    Succeeded,
+    Failed(i8),
+}
+
+impl Into<Value> for RequestStatus {
+    fn into(self) -> Value {
+        match self {
+            RequestStatus::New => Value::Int(0),
+            RequestStatus::InProgress => Value::Int(1),
+            RequestStatus::Succeeded => Value::Int(2),
+            RequestStatus::Failed(e) => Value::Int(e as i64),
+        }
+    }
+}
+
+impl TryFrom<Value> for RequestStatus {
+    type Error = FromValueError;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Int(code) => match code {
+                0 => Ok(Self::New),
+                1 => Ok(Self::InProgress),
+                2 => Ok(Self::Succeeded),
+                n => if i8::MIN as i64 <= n && n < 0 {
+                    Ok(Self::Failed(n as i8))
+                } else {
+                    Err(FromValueError(value))
+                }
+            },
+            _ => Err(FromValueError(value)),
+        }
+    }
+}
+
+impl FromValue for RequestStatus {
+    type Intermediate = RequestStatus;
+}
+
+// ===================================================================
+// Request
 // ===================================================================
 
 pub struct Request {
     pub id: String,
     pub issuer_id: String,
     pub request_type: RequestType,
-    pub status: i8,
+    pub status: RequestStatus,
     pub proc_id: Option<String>,
     pub description: Option<String>,
-    pub rand: u64,
+    pub rand: u32,
     pub created_by: String,
     pub created_at: PrimitiveDateTime,
     pub updated_by: String,
     pub updated_at: PrimitiveDateTime,
-}
-
-pub struct CreateUserRequest {
-    pub id: String,
-    pub username: Option<String>,
-    pub email: String,
-    pub pubkey: Vec<u8>,
-    pub created_by: String,
-    pub created_at: PrimitiveDateTime,
-}
-
-pub struct ChangePubkeyRequest {
-    pub id: String,
-    pub user_id: String,
-    pub pubkey: Vec<u8>,
-    pub created_by: String,
-    pub created_at: PrimitiveDateTime,
-}
-
-pub struct RenewPasswordRequest {
-    pub id: String,
-    pub user_id: String,
-    pub created_by: String,
-    pub created_at: PrimitiveDateTime,
 }
 
 impl FromRow for Request {
@@ -103,6 +125,19 @@ impl FromRow for Request {
     }
 }
 
+// ===================================================================
+// Creating a User
+// ===================================================================
+
+pub struct CreateUserRequest {
+    pub id: String,
+    pub username: Option<String>,
+    pub email: String,
+    pub pubkey: Vec<u8>,
+    pub created_by: String,
+    pub created_at: PrimitiveDateTime,
+}
+
 impl FromRow for CreateUserRequest {
     fn from_row_opt(row: Row) -> Result<Self, FromRowError> {
         Ok(CreateUserRequest {
@@ -116,6 +151,18 @@ impl FromRow for CreateUserRequest {
     }
 }
 
+// ===================================================================
+// Changing the Public Key
+// ===================================================================
+
+pub struct ChangePubkeyRequest {
+    pub id: String,
+    pub user_id: String,
+    pub pubkey: Vec<u8>,
+    pub created_by: String,
+    pub created_at: PrimitiveDateTime,
+}
+
 impl FromRow for ChangePubkeyRequest {
     fn from_row_opt(row: Row) -> Result<Self, FromRowError> {
         Ok(ChangePubkeyRequest {
@@ -126,6 +173,17 @@ impl FromRow for ChangePubkeyRequest {
             created_at: get_from_row(&row, 4)?,
         })
     }
+}
+
+// ===================================================================
+// Renewing the Password
+// ===================================================================
+
+pub struct RenewPasswordRequest {
+    pub id: String,
+    pub user_id: String,
+    pub created_by: String,
+    pub created_at: PrimitiveDateTime,
 }
 
 impl FromRow for RenewPasswordRequest {

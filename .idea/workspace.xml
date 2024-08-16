@@ -10,11 +10,8 @@
     <list default="true" id="c82446b1-71c7-4b15-967f-3afbbc06a30b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/background/src/bin/min-auth-dispatch.rs" beforeDir="false" afterPath="$PROJECT_DIR$/background/src/bin/min-auth-dispatch.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/background/src/bin/min-auth-genconfig.rs" beforeDir="false" afterPath="$PROJECT_DIR$/background/src/bin/min-auth-genconfig.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/src/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/config.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/src/requests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/requests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/min-auth.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/schema/tables.sql" beforeDir="false" afterPath="$PROJECT_DIR$/schema/tables.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -143,6 +140,9 @@
       <workItem from="1723730469755" duration="584000" />
       <workItem from="1723731130476" duration="174000" />
       <workItem from="1723732189772" duration="2041000" />
+      <workItem from="1723766592684" duration="1606000" />
+      <workItem from="1723769246030" duration="104000" />
+      <workItem from="1723769416311" duration="7386000" />
     </task>
     <servers />
   </component>

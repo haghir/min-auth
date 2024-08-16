@@ -3,41 +3,16 @@ use mysql_async::{Opts, OptsBuilder};
 use serde::{Serialize, Deserialize};
 use toml::{de::from_str, ser::to_string};
 
+// ===================================================================
+// Authentication Service
+// ===================================================================
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct MinAuthConfig {
     pub hostname: String,
     pub password_secret: String,
     pub mysql: MySQLConfig,
     pub redis: RedisConfig,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct WebConfig {
-    pub requests_dir: String,
-    pub mysql: MySQLConfig,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct BackgroundConfig {
-    pub workers: u64,
-    pub requests_dir: String,
-    pub workspace_dir: String,
-    pub mysql: MySQLConfig,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct MySQLConfig {
-    pub hostname: String,
-    pub port: u16,
-    pub username: String,
-    pub password: String,
-    pub database: String,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct RedisConfig {
-    pub uri: String,
-    pub lifetime: u64,
 }
 
 impl TryFrom<&String> for MinAuthConfig {
@@ -56,6 +31,16 @@ impl TryFrom<&MinAuthConfig> for String {
     }
 }
 
+// ===================================================================
+// Web Service
+// ===================================================================
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct WebConfig {
+    pub requests_dir: String,
+    pub mysql: MySQLConfig,
+}
+
 impl TryFrom<&String> for WebConfig {
     type Error = toml::de::Error;
 
@@ -70,6 +55,18 @@ impl TryFrom<&WebConfig> for String {
     fn try_from(value: &WebConfig) -> Result<Self, Self::Error> {
         to_string(value)
     }
+}
+
+// ===================================================================
+// Background Service
+// ===================================================================
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct BackgroundConfig {
+    pub workers: u32,
+    pub requests_dir: String,
+    pub workspace_dir: String,
+    pub mysql: MySQLConfig,
 }
 
 impl TryFrom<&String> for BackgroundConfig {
@@ -88,6 +85,19 @@ impl TryFrom<&BackgroundConfig> for String {
     }
 }
 
+// ===================================================================
+// MySQL
+// ===================================================================
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct MySQLConfig {
+    pub hostname: String,
+    pub port: u16,
+    pub username: String,
+    pub password: String,
+    pub database: String,
+}
+
 impl From<&MySQLConfig> for Opts {
     fn from(value: &MySQLConfig) -> Self {
         OptsBuilder::default()
@@ -98,4 +108,14 @@ impl From<&MySQLConfig> for Opts {
             .db_name(Some(&value.database))
             .into()
     }
+}
+
+// ===================================================================
+// Redis
+// ===================================================================
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct RedisConfig {
+    pub uri: String,
+    pub lifetime: u64,
 }

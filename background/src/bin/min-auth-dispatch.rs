@@ -1,10 +1,12 @@
 use std::env;
+use std::fs::create_dir_all;
+use std::path::{Path, PathBuf};
 use getopts::Options;
-use mysql_async::{params, Conn, Opts};
+use mysql_async::{params, Conn, Opts, TxOpts};
 use mysql_async::prelude::*;
 use min_auth_common::config::BackgroundConfig;
 use min_auth_common::error::Error;
-use min_auth_common::requests::{ChangePubkeyRequest, CreateUserRequest, RenewPasswordRequest, Request, RequestType};
+use min_auth_common::requests::{ChangePubkeyRequest, CreateUserRequest, RenewPasswordRequest, Request, RequestStatus, RequestType};
 use min_auth_common::Result;
 
 // ===================================================================
@@ -27,9 +29,12 @@ async fn get_request(conn: &mut Conn, id: &String) -> Result<Request> {
     FROM
         `requests`
     WHERE
-        `id` = :id
+        `id` = :id AND
+        `status` = :status
+    FOR UPDATE
     "#.with(params! {
-        "id" => id
+        "id" => id,
+        "status" => RequestStatus::New,
     });
 
     query.first(conn).await?.ok_or_else(||
@@ -49,7 +54,7 @@ async fn get_create_user_request(conn: &mut Conn, id: &String) -> Result<CreateU
     WHERE
         `id` = :id
     "#.with(params! {
-        "id" => id
+        "id" => id,
     });
 
     query.first(conn).await?.ok_or_else(||
@@ -68,7 +73,7 @@ async fn get_change_pubkey_request(conn: &mut Conn, id: &String) -> Result<Chang
     WHERE
         `id` = :id
     "#.with(params! {
-        "id" => id
+        "id" => id,
     });
 
     query.first(conn).await?.ok_or_else(||
@@ -86,7 +91,7 @@ async fn get_renew_password_request(conn: &mut Conn, id: &String) -> Result<Rene
     WHERE
         `id` = :id
     "#.with(params! {
-        "id" => id
+        "id" => id,
     });
 
     query.first(conn).await?.ok_or_else(||
@@ -97,22 +102,22 @@ async fn get_renew_password_request(conn: &mut Conn, id: &String) -> Result<Rene
 // Request Handler
 // ===================================================================
 
-async fn handle_create_user_request(
-    request: &Request, worker: u64, conn: &mut Conn, config: &BackgroundConfig
+async fn handle_create_user_request<P: AsRef<Path>>(
+    conn: &mut Conn, dir: P, request: &Request
 ) -> Result<()> {
     let sub = get_create_user_request(conn, &request.id).await?;
     Ok(())
 }
 
-async fn handle_change_pubkey_request(
-    request: &Request, worker: u64, conn: &mut Conn, config: &BackgroundConfig
+async fn handle_change_pubkey_request<P: AsRef<Path>>(
+    conn: &mut Conn, dir: P, request: &Request
 ) -> Result<()> {
     let sub = get_change_pubkey_request(conn, &request.id).await?;
     Ok(())
 }
 
-async fn handle_renew_password_request(
-    request: &Request, worker: u64, conn: &mut Conn, config: &BackgroundConfig
+async fn handle_renew_password_request<P: AsRef<Path>>(
+    conn: &mut Conn, dir: P, request: &Request
 ) -> Result<()> {
     let sub = get_renew_password_request(conn, &request.id).await?;
     Ok(())
@@ -126,7 +131,7 @@ async fn handle_renew_password_request(
 async fn main() -> Result<()> {
     env_logger::init();
 
-    // Parses command line arguments.
+    // Parse command line arguments
     let args: Vec<String> = env::args().collect();
 
     let mut opts = Options::new();
@@ -139,24 +144,38 @@ async fn main() -> Result<()> {
     let id = matches.opt_str("i")
         .ok_or(Error::from("No ID was specified."))?;
 
-    // Loads a configuration file.
+    // Load a configuration file
     let config: String = std::fs::read_to_string(config_path)?;
     let config = <&String as TryInto<BackgroundConfig>>::try_into(&config)?;
 
-    // Initializes a MySQL client.
+    // Initialize a MySQL client
     let opts: Opts = (&config.mysql).into();
     let mut conn = Conn::new(opts).await?;
 
+    let tx_opts = TxOpts::default();
+    let mut tx = conn.start_transaction(tx_opts).await?;
+
+    // Get the specified request
     let request = get_request(&mut conn, &id).await?;
     let worker = request.rand % config.workers;
+
+    // Paths
+    let tmp = "tmp".to_string();
+    let tmp_dir: PathBuf = [&config.workspace_dir, &tmp, &id].iter().collect();
+    let wk_dir: PathBuf = [&config.workspace_dir, &worker.to_string(), &id].iter().collect();
+
+    create_dir_all(&tmp_dir)?;
+
     match request.request_type {
         RequestType::CreateUserRequest =>
-            handle_create_user_request(&request, worker, &mut conn, &config).await?,
+            handle_create_user_request(&mut conn, &tmp_dir, &request).await?,
         RequestType::ChangePubkeyRequest =>
-            handle_change_pubkey_request(&request, worker, &mut conn, &config).await?,
+            handle_change_pubkey_request(&mut conn, &tmp_dir, &request).await?,
         RequestType::RenewPasswordRequest =>
-            handle_renew_password_request(&request, worker, &mut conn, &config).await?,
+            handle_renew_password_request(&mut conn, &tmp_dir, &request).await?,
     };
+
+    tx.commit().await?;
 
     Ok(())
 }
