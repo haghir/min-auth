@@ -2,9 +2,6 @@ use serde::{Serialize, Deserialize};
 use serde_json::json;
 use sha2::{Sha256, Digest};
 use log::debug;
-use mysql_async::prelude::FromRow;
-use mysql_async::{FromRowError, Row};
-use crate::utils::get_from_row;
 
 #[derive(Serialize, Deserialize)]
 pub struct Credential {
@@ -50,14 +47,4 @@ pub fn get_hash(password: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(encoded);
     hex::encode(hasher.finalize()).to_lowercase()
-}
-
-impl FromRow for Credential {
-    fn from_row_opt(row: Row) -> Result<Self, FromRowError> {
-        Ok(Credential {
-            id: get_from_row(&row, 0)?,
-            salt: get_from_row(&row, 1)?,
-            pwhash: get_from_row(&row, 2)?,
-        })
-    }
 }

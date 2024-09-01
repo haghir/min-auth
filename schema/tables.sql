@@ -34,7 +34,7 @@ CREATE TABLE `requests` (
     `id`            CHAR(24)            CHARSET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY
 ,   `issuer_id`     CHAR(24)            CHARSET ascii COLLATE ascii_bin NOT NULL
 ,   `type`          TINYINT             NOT NULL -- refs. common/src/requests.rs
-,   `status`        TINYINT             NOT NULL -- 0: new, 1: in progress, 2: succeeded, <0: error code
+,   `state`         TINYINT             NOT NULL -- 0: new, 1: in progress, 2: succeeded, <0: error code
 ,   `proc_id`       CHAR(24)            CHARSET ascii COLLATE ascii_bin
 ,   `description`   TEXT
 ,   `rand`          INTEGER UNSIGNED    NOT NULL

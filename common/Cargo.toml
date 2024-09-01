@@ -10,15 +10,13 @@ getopts = "0.2.21"
 hex = "0.4.3"
 itertools = "0.13.0"
 log = "0.4.22"
-mysql_async = "0.34.2"
 rand = { version = "0.8.5", features = ["std_rng"] }
 redis = { version = "0.26.1", features = ["tokio-comp"] }
-serde = "1.0.207"
+serde = { version = "1.0.207", features = ["derive"] }
 serde_json = "1.0.124"
 sha1 = "0.10.6"
 sha2 = "0.10.8"
 time = "0.3.36"
-tokio = { version = "1.39.2", features = ["full"] }
 toml = "0.8.19"
 
 [dev-dependencies]

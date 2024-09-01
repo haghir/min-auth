@@ -1411,6 +1411,7 @@ dependencies = [
  "getopts",
  "min-auth-common",
  "mysql_async",
+ "serde_json",
  "tokio",
 ]
 
@@ -1424,7 +1425,6 @@ dependencies = [
  "hex",
  "itertools 0.13.0",
  "log",
- "mysql_async",
  "rand",
  "redis",
  "serde",
@@ -1433,7 +1433,6 @@ dependencies = [
  "sha2",
  "test-log",
  "time",
- "tokio",
  "toml",
 ]
 

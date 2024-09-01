@@ -1,24 +1,27 @@
+use std::cell::RefCell;
 use std::env;
-use std::fs::create_dir_all;
+use std::fs::{create_dir_all, File};
+use std::io::Write;
+use std::ops::DerefMut;
 use std::path::{Path, PathBuf};
 use getopts::Options;
 use mysql_async::{params, Conn, Opts, TxOpts};
 use mysql_async::prelude::*;
 use min_auth_common::config::BackgroundConfig;
 use min_auth_common::error::Error;
-use min_auth_common::requests::{ChangePubkeyRequest, CreateUserRequest, RenewPasswordRequest, Request, RequestStatus, RequestType};
+use min_auth_common::requests::{ChangePubkeyRequest, CreateUserRequest, RenewPasswordRequest, Request, RequestState, RequestType};
 use min_auth_common::Result;
 
 // ===================================================================
 // Load from DB
 // ===================================================================
 
-async fn get_request(conn: &mut Conn, id: &String) -> Result<Request> {
+async fn get_request(conn: &RefCell<Conn>, id: &String) -> Result<Request> {
     let query = r#"SELECT
         `id`
     ,   `issuer_id`
     ,   `type`
-    ,   `status`
+    ,   `state`
     ,   `proc_id`
     ,   `description`
     ,   `rand`
@@ -30,18 +33,18 @@ async fn get_request(conn: &mut Conn, id: &String) -> Result<Request> {
         `requests`
     WHERE
         `id` = :id AND
-        `status` = :status
+        `state` = :state
     FOR UPDATE
     "#.with(params! {
         "id" => id,
-        "status" => RequestStatus::New,
+        "state" => RequestState::New,
     });
 
-    query.first(conn).await?.ok_or_else(||
+    query.first(conn.borrow_mut().deref_mut()).await?.ok_or_else(||
         Error::from(format!("Request {} was not found.", id)))
 }
 
-async fn get_create_user_request(conn: &mut Conn, id: &String) -> Result<CreateUserRequest> {
+async fn get_create_user_request(conn: &RefCell<Conn>, id: &String) -> Result<CreateUserRequest> {
     let query = r#"SELECT
         `id`
     ,   `username`
@@ -57,11 +60,11 @@ async fn get_create_user_request(conn: &mut Conn, id: &String) -> Result<CreateU
         "id" => id,
     });
 
-    query.first(conn).await?.ok_or_else(||
+    query.first(conn.borrow_mut().deref_mut()).await?.ok_or_else(||
         Error::from(format!("CreateUserRequest {} was not found.", id)))
 }
 
-async fn get_change_pubkey_request(conn: &mut Conn, id: &String) -> Result<ChangePubkeyRequest> {
+async fn get_change_pubkey_request(conn: &RefCell<Conn>, id: &String) -> Result<ChangePubkeyRequest> {
     let query = r#"SELECT
         `id`
     ,   `user_id`
@@ -76,11 +79,11 @@ async fn get_change_pubkey_request(conn: &mut Conn, id: &String) -> Result<Chang
         "id" => id,
     });
 
-    query.first(conn).await?.ok_or_else(||
+    query.first(conn.borrow_mut().deref_mut()).await?.ok_or_else(||
         Error::from(format!("ChangePubkeyRequest {} was not found.", id)))
 }
 
-async fn get_renew_password_request(conn: &mut Conn, id: &String) -> Result<RenewPasswordRequest> {
+async fn get_renew_password_request(conn: &RefCell<Conn>, id: &String) -> Result<RenewPasswordRequest> {
     let query = r#"SELECT
         `id`
     ,   `user_id`
@@ -94,8 +97,23 @@ async fn get_renew_password_request(conn: &mut Conn, id: &String) -> Result<Rene
         "id" => id,
     });
 
-    query.first(conn).await?.ok_or_else(||
+    query.first(conn.borrow_mut().deref_mut()).await?.ok_or_else(||
         Error::from(format!("RenewPasswordRequest {} was not found.", id)))
+}
+
+// ===================================================================
+// Update the request state
+// ===================================================================
+
+async fn update_state(conn: &RefCell<Conn>, id: &String) -> Result<()> {
+    r"UPDATE requests SET state = :state WHERE id = :id".with(params! {
+        "state" => RequestState::InProgress,
+        "id" => id,
+    })
+        .ignore(conn.borrow_mut().deref_mut())
+        .await?;
+
+    Ok(())
 }
 
 // ===================================================================
@@ -103,23 +121,90 @@ async fn get_renew_password_request(conn: &mut Conn, id: &String) -> Result<Rene
 // ===================================================================
 
 async fn handle_create_user_request<P: AsRef<Path>>(
-    conn: &mut Conn, dir: P, request: &Request
+    conn: &RefCell<Conn>, dir: P, request: &Request
 ) -> Result<()> {
+    // Write the json to a file
+    let sub_path = dir.as_ref().join("sub.json");
     let sub = get_create_user_request(conn, &request.id).await?;
+    let sub_json = serde_json::to_string(&sub)?;
+    let f = File::create_new(sub_path)?;
+    write!(f, "{}", sub_json)?;
+
+    // Write the pubkey to a file
+    let pubkey_path = dir.as_ref().join("pubkey");
+    let mut f = File::create_new(pubkey_path)?;
+    f.write(sub.pubkey.as_slice())?;
+
     Ok(())
 }
 
 async fn handle_change_pubkey_request<P: AsRef<Path>>(
-    conn: &mut Conn, dir: P, request: &Request
+    conn: &RefCell<Conn>, dir: P, request: &Request
 ) -> Result<()> {
+    // Write the json to a file
+    let sub_path = dir.as_ref().join("sub.json");
     let sub = get_change_pubkey_request(conn, &request.id).await?;
+    let sub_json = serde_json::to_string(&sub)?;
+    let f = File::create_new(sub_path)?;
+    write!(f, "{}", sub_json)?;
+
+    // Write the pubkey to a file
+    let pubkey_path = dir.as_ref().join("pubkey");
+    let mut f = File::create_new(pubkey_path)?;
+    f.write(sub.pubkey.as_slice())?;
     Ok(())
 }
 
 async fn handle_renew_password_request<P: AsRef<Path>>(
-    conn: &mut Conn, dir: P, request: &Request
+    conn: &RefCell<Conn>, dir: P, request: &Request
 ) -> Result<()> {
+    // Write the json to a file
+    let sub_path = dir.as_ref().join("sub.json");
     let sub = get_renew_password_request(conn, &request.id).await?;
+    let sub_json = serde_json::to_string(&sub)?;
+    let f = File::create_new(sub_path)?;
+    write!(f, "{}", sub_json)?;
+    Ok(())
+}
+
+// ===================================================================
+// Dispatch
+// ===================================================================
+
+async fn dispatch(config: &BackgroundConfig, id: &String) -> Result<()> {
+    // Initialize a MySQL client
+    let opts: Opts = (&config.mysql).into();
+    let mut conn = RefCell::new(Conn::new(opts).await?);
+    let mut ref_conn = conn.borrow_mut();
+
+    let tx_opts = TxOpts::default();
+    let mut tx = ref_conn.start_transaction(tx_opts).await?;
+
+    // Get the specified request
+    let request = get_request(&conn, &id).await?;
+
+    // Paths
+    let tmp = "tmp".to_string();
+    let tmp_dir: PathBuf = [&config.workspace_dir, &tmp, &id].iter().collect();
+
+    create_dir_all(&tmp_dir)?;
+
+    match request.request_type {
+        RequestType::CreateUserRequest =>
+            handle_create_user_request(&conn, &tmp_dir, &request).await?,
+        RequestType::ChangePubkeyRequest =>
+            handle_change_pubkey_request(&conn, &tmp_dir, &request).await?,
+        RequestType::RenewPasswordRequest =>
+            handle_renew_password_request(&conn, &tmp_dir, &request).await?,
+    };
+
+    update_state(&conn, &id).await?;
+
+    // Print the worker index.
+    print!("{}", request.rand % config.workers);
+
+    tx.commit().await?;
+
     Ok(())
 }
 
@@ -148,34 +233,5 @@ async fn main() -> Result<()> {
     let config: String = std::fs::read_to_string(config_path)?;
     let config = <&String as TryInto<BackgroundConfig>>::try_into(&config)?;
 
-    // Initialize a MySQL client
-    let opts: Opts = (&config.mysql).into();
-    let mut conn = Conn::new(opts).await?;
-
-    let tx_opts = TxOpts::default();
-    let mut tx = conn.start_transaction(tx_opts).await?;
-
-    // Get the specified request
-    let request = get_request(&mut conn, &id).await?;
-    let worker = request.rand % config.workers;
-
-    // Paths
-    let tmp = "tmp".to_string();
-    let tmp_dir: PathBuf = [&config.workspace_dir, &tmp, &id].iter().collect();
-    let wk_dir: PathBuf = [&config.workspace_dir, &worker.to_string(), &id].iter().collect();
-
-    create_dir_all(&tmp_dir)?;
-
-    match request.request_type {
-        RequestType::CreateUserRequest =>
-            handle_create_user_request(&mut conn, &tmp_dir, &request).await?,
-        RequestType::ChangePubkeyRequest =>
-            handle_change_pubkey_request(&mut conn, &tmp_dir, &request).await?,
-        RequestType::RenewPasswordRequest =>
-            handle_renew_password_request(&mut conn, &tmp_dir, &request).await?,
-    };
-
-    tx.commit().await?;
-
-    Ok(())
+    dispatch(&config, &id).await
 }

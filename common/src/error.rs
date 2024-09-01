@@ -81,19 +81,19 @@ impl From<redis::RedisError> for Error {
     }
 }
 
-impl From<mysql_async::Error> for Error {
-    fn from(value: mysql_async::Error) -> Self {
+impl From<std::num::ParseIntError> for Error {
+    fn from(value: std::num::ParseIntError) -> Self {
         Self {
-            source: "mysql_async::Error",
+            source: "std::num::ParseIntError",
             message: value.to_string(),
         }
     }
 }
 
-impl From<std::num::ParseIntError> for Error {
-    fn from(value: std::num::ParseIntError) -> Self {
+impl From<serde_json::Error> for Error {
+    fn from(value: serde_json::Error) -> Self {
         Self {
-            source: "std::num::ParseIntError",
+            source: "serde_json::Error",
             message: value.to_string(),
         }
     }

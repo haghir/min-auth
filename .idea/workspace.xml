@@ -9,9 +9,19 @@
   <component name="ChangeListManager">
     <list default="true" id="c82446b1-71c7-4b15-967f-3afbbc06a30b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/background/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/background/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/background/src/bin/min-auth-dispatch.rs" beforeDir="false" afterPath="$PROJECT_DIR$/background/src/bin/min-auth-dispatch.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/common/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/base58.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/base35.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/src/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/config.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/credentials.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/credentials.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/error.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/error.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/genid.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/genid.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/lib.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/src/requests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/requests.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/utils.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/schema/tables.sql" beforeDir="false" afterPath="$PROJECT_DIR$/schema/tables.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,6 +54,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Cargo.Test min-auth.executor&quot;: &quot;Run&quot;,
     &quot;Cargo.clean.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.rust.reset.selective.auto.import&quot;: &quot;true&quot;,
@@ -52,6 +63,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
+    &quot;org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon&quot;: &quot;&quot;,
     &quot;org.rust.first.attach.projects&quot;: &quot;true&quot;
   }
 }</component>
@@ -143,6 +155,11 @@
       <workItem from="1723766592684" duration="1606000" />
       <workItem from="1723769246030" duration="104000" />
       <workItem from="1723769416311" duration="7386000" />
+      <workItem from="1724244117110" duration="4075000" />
+      <workItem from="1724250308520" duration="3078000" />
+      <workItem from="1725112888507" duration="7445000" />
+      <workItem from="1725155168027" duration="10065000" />
+      <workItem from="1725192913045" duration="4367000" />
     </task>
     <servers />
   </component>

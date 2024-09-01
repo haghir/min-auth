@@ -1,5 +1,4 @@
 use std::convert::TryFrom;
-use mysql_async::{Opts, OptsBuilder};
 use serde::{Serialize, Deserialize};
 use toml::{de::from_str, ser::to_string};
 
@@ -11,7 +10,6 @@ use toml::{de::from_str, ser::to_string};
 pub struct MinAuthConfig {
     pub hostname: String,
     pub password_secret: String,
-    pub mysql: MySQLConfig,
     pub redis: RedisConfig,
 }
 
@@ -38,7 +36,6 @@ impl TryFrom<&MinAuthConfig> for String {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct WebConfig {
     pub requests_dir: String,
-    pub mysql: MySQLConfig,
 }
 
 impl TryFrom<&String> for WebConfig {
@@ -66,7 +63,6 @@ pub struct BackgroundConfig {
     pub workers: u32,
     pub requests_dir: String,
     pub workspace_dir: String,
-    pub mysql: MySQLConfig,
 }
 
 impl TryFrom<&String> for BackgroundConfig {
@@ -82,31 +78,6 @@ impl TryFrom<&BackgroundConfig> for String {
 
     fn try_from(value: &BackgroundConfig) -> Result<Self, Self::Error> {
         to_string(value)
-    }
-}
-
-// ===================================================================
-// MySQL
-// ===================================================================
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct MySQLConfig {
-    pub hostname: String,
-    pub port: u16,
-    pub username: String,
-    pub password: String,
-    pub database: String,
-}
-
-impl From<&MySQLConfig> for Opts {
-    fn from(value: &MySQLConfig) -> Self {
-        OptsBuilder::default()
-            .ip_or_hostname(&value.hostname)
-            .tcp_port(value.port)
-            .user(Some(&value.username))
-            .pass(Some(&value.password))
-            .db_name(Some(&value.database))
-            .into()
     }
 }
 
