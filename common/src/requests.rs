@@ -5,10 +5,10 @@ use serde::{Deserialize, Serialize};
 // ===================================================================
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
-pub enum RequestType {
-    CreateUserRequest(CreateUserRequest),
-    ChangePubkeyRequest(ChangePubkeyRequest),
-    RenewPasswordRequest(ChangePubkeyRequest),
+pub enum RequestContent {
+    CreateUser(CreateUserRequest),
+    UpdateUser(UpdateUserRequest),
+    RenewPassword(RenewPasswordRequest),
 }
 
 // ===================================================================
@@ -20,7 +20,8 @@ pub struct Request {
     pub id: String,
     pub issuer: String,
     pub timestamp: String,
-    pub content: RequestType,
+    pub content: RequestContent,
+    pub rand: u64,
 }
 
 // ===================================================================
@@ -31,7 +32,7 @@ pub struct Request {
 pub struct CreateUserRequest {
     pub username: String,
     pub email: String,
-    pub pubkey_id: String,
+    pub superuser: bool,
 }
 
 // ===================================================================
@@ -39,9 +40,12 @@ pub struct CreateUserRequest {
 // ===================================================================
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct ChangePubkeyRequest {
+pub struct UpdateUserRequest {
     pub user_id: String,
-    pub pubkey_id: String,
+    pub username: Option<String>,
+    pub email: Option<String>,
+    pub superuser: Option<bool>,
+    pub renew_password: bool,
 }
 
 // ===================================================================

@@ -1,16 +1,18 @@
+use getopts::Options;
+use min_auth_common::config::BackgroundConfig;
+use min_auth_common::error::Error;
+use min_auth_common::requests::{
+    CreateUserRequest, RenewPasswordRequest, Request, RequestContent, UpdateUserRequest,
+};
+use min_auth_common::Result;
+use mysql_async::prelude::*;
+use mysql_async::{params, Conn, Opts, TxOpts};
 use std::cell::RefCell;
 use std::env;
 use std::fs::{create_dir_all, File};
 use std::io::Write;
 use std::ops::DerefMut;
 use std::path::{Path, PathBuf};
-use getopts::Options;
-use mysql_async::{params, Conn, Opts, TxOpts};
-use mysql_async::prelude::*;
-use min_auth_common::config::BackgroundConfig;
-use min_auth_common::error::Error;
-use min_auth_common::requests::{ChangePubkeyRequest, CreateUserRequest, RenewPasswordRequest, Request, RequestState, RequestType};
-use min_auth_common::Result;
 
 // ===================================================================
 // Load from DB
@@ -35,13 +37,16 @@ async fn get_request(conn: &RefCell<Conn>, id: &String) -> Result<Request> {
         `id` = :id AND
         `state` = :state
     FOR UPDATE
-    "#.with(params! {
+    "#
+    .with(params! {
         "id" => id,
         "state" => RequestState::New,
     });
 
-    query.first(conn.borrow_mut().deref_mut()).await?.ok_or_else(||
-        Error::from(format!("Request {} was not found.", id)))
+    query
+        .first(conn.borrow_mut().deref_mut())
+        .await?
+        .ok_or_else(|| Error::from(format!("Request {} was not found.", id)))
 }
 
 async fn get_create_user_request(conn: &RefCell<Conn>, id: &String) -> Result<CreateUserRequest> {
@@ -56,15 +61,21 @@ async fn get_create_user_request(conn: &RefCell<Conn>, id: &String) -> Result<Cr
         `create_user_requests`
     WHERE
         `id` = :id
-    "#.with(params! {
+    "#
+    .with(params! {
         "id" => id,
     });
 
-    query.first(conn.borrow_mut().deref_mut()).await?.ok_or_else(||
-        Error::from(format!("CreateUserRequest {} was not found.", id)))
+    query
+        .first(conn.borrow_mut().deref_mut())
+        .await?
+        .ok_or_else(|| Error::from(format!("CreateUserRequest {} was not found.", id)))
 }
 
-async fn get_change_pubkey_request(conn: &RefCell<Conn>, id: &String) -> Result<ChangePubkeyRequest> {
+async fn get_change_pubkey_request(
+    conn: &RefCell<Conn>,
+    id: &String,
+) -> Result<ChangePubkeyRequest> {
     let query = r#"SELECT
         `id`
     ,   `user_id`
@@ -75,15 +86,21 @@ async fn get_change_pubkey_request(conn: &RefCell<Conn>, id: &String) -> Result<
         `change_pubkey_requests`
     WHERE
         `id` = :id
-    "#.with(params! {
+    "#
+    .with(params! {
         "id" => id,
     });
 
-    query.first(conn.borrow_mut().deref_mut()).await?.ok_or_else(||
-        Error::from(format!("ChangePubkeyRequest {} was not found.", id)))
+    query
+        .first(conn.borrow_mut().deref_mut())
+        .await?
+        .ok_or_else(|| Error::from(format!("ChangePubkeyRequest {} was not found.", id)))
 }
 
-async fn get_renew_password_request(conn: &RefCell<Conn>, id: &String) -> Result<RenewPasswordRequest> {
+async fn get_renew_password_request(
+    conn: &RefCell<Conn>,
+    id: &String,
+) -> Result<RenewPasswordRequest> {
     let query = r#"SELECT
         `id`
     ,   `user_id`
@@ -93,12 +110,15 @@ async fn get_renew_password_request(conn: &RefCell<Conn>, id: &String) -> Result
         `renew_password_requests`
     WHERE
         `id` = :id
-    "#.with(params! {
+    "#
+    .with(params! {
         "id" => id,
     });
 
-    query.first(conn.borrow_mut().deref_mut()).await?.ok_or_else(||
-        Error::from(format!("RenewPasswordRequest {} was not found.", id)))
+    query
+        .first(conn.borrow_mut().deref_mut())
+        .await?
+        .ok_or_else(|| Error::from(format!("RenewPasswordRequest {} was not found.", id)))
 }
 
 // ===================================================================
@@ -106,10 +126,11 @@ async fn get_renew_password_request(conn: &RefCell<Conn>, id: &String) -> Result
 // ===================================================================
 
 async fn update_state(conn: &RefCell<Conn>, id: &String) -> Result<()> {
-    r"UPDATE requests SET state = :state WHERE id = :id".with(params! {
-        "state" => RequestState::InProgress,
-        "id" => id,
-    })
+    r"UPDATE requests SET state = :state WHERE id = :id"
+        .with(params! {
+            "state" => RequestState::InProgress,
+            "id" => id,
+        })
         .ignore(conn.borrow_mut().deref_mut())
         .await?;
 
@@ -121,7 +142,9 @@ async fn update_state(conn: &RefCell<Conn>, id: &String) -> Result<()> {
 // ===================================================================
 
 async fn handle_create_user_request<P: AsRef<Path>>(
-    conn: &RefCell<Conn>, dir: P, request: &Request
+    conn: &RefCell<Conn>,
+    dir: P,
+    request: &Request,
 ) -> Result<()> {
     // Write the json to a file
     let sub_path = dir.as_ref().join("sub.json");
@@ -139,7 +162,9 @@ async fn handle_create_user_request<P: AsRef<Path>>(
 }
 
 async fn handle_change_pubkey_request<P: AsRef<Path>>(
-    conn: &RefCell<Conn>, dir: P, request: &Request
+    conn: &RefCell<Conn>,
+    dir: P,
+    request: &Request,
 ) -> Result<()> {
     // Write the json to a file
     let sub_path = dir.as_ref().join("sub.json");
@@ -156,7 +181,9 @@ async fn handle_change_pubkey_request<P: AsRef<Path>>(
 }
 
 async fn handle_renew_password_request<P: AsRef<Path>>(
-    conn: &RefCell<Conn>, dir: P, request: &Request
+    conn: &RefCell<Conn>,
+    dir: P,
+    request: &Request,
 ) -> Result<()> {
     // Write the json to a file
     let sub_path = dir.as_ref().join("sub.json");
@@ -190,12 +217,15 @@ async fn dispatch(config: &BackgroundConfig, id: &String) -> Result<()> {
     create_dir_all(&tmp_dir)?;
 
     match request.request_type {
-        RequestType::CreateUserRequest =>
-            handle_create_user_request(&conn, &tmp_dir, &request).await?,
-        RequestType::ChangePubkeyRequest =>
-            handle_change_pubkey_request(&conn, &tmp_dir, &request).await?,
-        RequestType::RenewPasswordRequest =>
-            handle_renew_password_request(&conn, &tmp_dir, &request).await?,
+        RequestContent::CreateUserRequest => {
+            handle_create_user_request(&conn, &tmp_dir, &request).await?
+        }
+        RequestContent::ChangePubkeyRequest => {
+            handle_change_pubkey_request(&conn, &tmp_dir, &request).await?
+        }
+        RequestContent::RenewPasswordRequest => {
+            handle_renew_password_request(&conn, &tmp_dir, &request).await?
+        }
     };
 
     update_state(&conn, &id).await?;
@@ -224,9 +254,11 @@ async fn main() -> Result<()> {
     opts.optopt("i", "id", "request ID", "ID");
 
     let matches = opts.parse(&args[1..])?;
-    let config_path = matches.opt_str("c")
+    let config_path = matches
+        .opt_str("c")
         .ok_or(Error::from("No config path was specified."))?;
-    let id = matches.opt_str("i")
+    let id = matches
+        .opt_str("i")
         .ok_or(Error::from("No ID was specified."))?;
 
     // Load a configuration file
