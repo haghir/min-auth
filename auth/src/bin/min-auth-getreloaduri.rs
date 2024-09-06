@@ -1,7 +1,7 @@
 use getopts::Options;
 use std::env;
 
-use min_auth_common::config::MinAuthConfig;
+use min_auth_auth::config::Config;
 use min_auth_common::error::Error;
 use min_auth_common::Result;
 
@@ -12,20 +12,23 @@ fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
     let mut opts = Options::new();
     opts.optopt("c", "config", "path to a config file", "CONFIG");
-    opts.optopt("p", "port", "port number", "PORT");
+    opts.optopt("i", "index", "process index", "PROCIDX");
     let matches = opts.parse(&args[1..])?;
-    let config_path = matches.opt_str("c")
+    let config_path = matches
+        .opt_str("c")
         .ok_or(Error::from("No config path was specified."))?;
-    let port = matches.opt_str("p")
-        .ok_or(Error::from("No port number was specified."))?;
+    let index: usize = matches
+        .opt_str("n")
+        .ok_or(Error::from("No process index was specified."))?
+        .parse::<usize>()?;
 
     // Laods a configuration file.
     let config: String = std::fs::read_to_string(config_path)?;
-    let config: MinAuthConfig = (&config).try_into()?;
-    let expose = format!("{}:{}", config.hostname, port);
+    let config: Config = (&config).try_into()?;
+    let expose = &config.expose[index];
 
     // Displays the service URI.
-    print!("http://{}/auth", expose);
+    println!("http://{}:{}/reload", expose.hostname, expose.port);
 
     Ok(())
 }

@@ -1,6 +1,6 @@
 use std::env;
 use getopts::Options;
-use min_auth_common::config::{BackgroundConfig, MySQLConfig};
+use min_auth_common::config::BackgroundConfig;
 use min_auth_common::error::Error;
 use min_auth_common::Result;
 
@@ -16,13 +16,6 @@ fn main() -> Result<()> {
         workers: 8,
         requests_dir: format!("{}/var/min-auth/requests", prefix),
         workspace_dir: format!("{}/var/min-auth/workspace", prefix),
-        mysql: MySQLConfig {
-            hostname: "localhost".to_string(),
-            port: 3306,
-            username: "minauth".to_string(),
-            password: "minauth".to_string(),
-            database: "minauth".to_string(),
-        },
     };
 
     let toml: String = match <&BackgroundConfig as TryInto<String>>::try_into(&config) {

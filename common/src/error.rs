@@ -1,4 +1,7 @@
-use std::fmt::{Display, Formatter};
+use std::{
+    ffi::OsString,
+    fmt::{Display, Formatter},
+};
 
 #[derive(Debug)]
 pub struct Error {
@@ -95,6 +98,15 @@ impl From<serde_json::Error> for Error {
         Self {
             source: "serde_json::Error",
             message: value.to_string(),
+        }
+    }
+}
+
+impl From<OsString> for Error {
+    fn from(value: OsString) -> Self {
+        Self {
+            source: "OsString",
+            message: format!("{:?}", value).to_string(),
         }
     }
 }
