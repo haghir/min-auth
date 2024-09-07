@@ -10,10 +10,13 @@ pub struct Error {
 }
 
 impl Error {
-    pub fn new(message: &str) -> Self {
+    pub fn new<S>(message: S) -> Self
+    where
+        S: AsRef<str>,
+    {
         Self {
             source: "min_auth::error::Error",
-            message: message.to_string(),
+            message: message.as_ref().to_string(),
         }
     }
 }

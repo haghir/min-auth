@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::{convert::TryFrom, path::Path};
+use std::convert::TryFrom;
 use toml::{de::from_str, ser::to_string};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -22,7 +22,7 @@ pub struct SecurityConfig {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct FsConfig {
-    pub users_dir: String,
+    pub users: String,
 }
 
 impl TryFrom<&String> for Config {

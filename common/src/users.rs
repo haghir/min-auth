@@ -1,11 +1,10 @@
-use crate::Result;
-use serde::{Deserialize, Serialize};
-use std::{
-    collections::hash_map::HashMap,
-    fs::{read_dir, File},
-    io::BufReader,
-    path::Path,
+use crate::{
+    data::{Data, DataFinder},
+    error::Error,
+    Result,
 };
+use serde::{Deserialize, Serialize};
+use std::{collections::hash_map::HashMap, path::Path};
 
 #[derive(Deserialize, Serialize, PartialEq, Clone, Debug)]
 pub enum AccessControlKind {
@@ -36,9 +35,10 @@ impl User {
     where
         P: AsRef<Path>,
     {
-        let file = File::open(path)?;
-        let reader = BufReader::new(file);
-        Ok(serde_json::from_reader(reader)?)
+        match Data::load(&path)? {
+            Data::User(user) => Ok(user),
+            _ => Err(Error::new(format!("{:?} is not a user.", path.as_ref()))),
+        }
     }
 }
 
@@ -48,29 +48,14 @@ where
 {
     let users_dir = users_dir.as_ref();
     let mut users: HashMap<String, User> = HashMap::new();
-
-    for entry in read_dir(users_dir)? {
-        let entry = entry?;
-        let path = entry.path();
-        let ftype = entry.file_type()?;
-
-        if ftype.is_dir() {
-            users.extend(load_users(&path)?);
-            continue;
-        }
-
-        if let Some(x) = path.extension() {
-            if x != "json" {
-                continue;
-            }
-        } else {
-            continue;
-        }
-
-        let user: User = User::load(path)?;
+    for data in DataFinder::new(&users_dir)? {
+        let data = data?;
+        let user = match data {
+            Data::User(item) => item,
+            _ => continue,
+        };
         users.insert(user.username.clone(), user);
     }
-
     Ok(users)
 }
 

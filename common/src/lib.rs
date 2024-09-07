@@ -1,5 +1,6 @@
 pub mod base35;
 pub mod credentials;
+pub mod data;
 pub mod error;
 pub mod genid;
 pub mod requests;

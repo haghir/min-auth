@@ -1,6 +1,6 @@
-use crate::{users::AccessControl, Result};
+use crate::{data::Data, error::Error, users::AccessControl, Result};
 use serde::{Deserialize, Serialize};
-use std::{fs::File, io::BufReader, path::Path};
+use std::path::Path;
 
 #[derive(Deserialize, Serialize, PartialEq, Clone, Debug)]
 pub enum RequestContent {
@@ -47,9 +47,10 @@ impl Request {
     where
         P: AsRef<Path>,
     {
-        let file = File::open(path)?;
-        let reader = BufReader::new(file);
-        Ok(serde_json::from_reader(reader)?)
+        match Data::load(&path)? {
+            Data::Request(request) => Ok(request),
+            _ => Err(Error::new(format!("{:?} is not a request.", path.as_ref()))),
+        }
     }
 }
 

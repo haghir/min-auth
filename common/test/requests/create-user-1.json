@@ -1,17 +1,19 @@
 {
-  "id": "create-user-1-request",
-  "issuer": "create-user-1-issuer",
-  "timestamp": "2024-01-01 12:34:56.789",
-  "content": {
-    "CreateUser": {
-      "username": "new-user-1",
-      "email": "new-user-1@example.com",
-      "superuser": true,
-      "acl": [
-        { "control": "Allow", "service": "service 1" },
-        { "control": "Deny", "service": "*" }
-      ]
-    }
-  },
-  "rand": 123456789
+  "Request": {
+    "id": "create-user-1-request",
+    "issuer": "create-user-1-issuer",
+    "timestamp": "2024-01-01 12:34:56.789",
+    "content": {
+      "CreateUser": {
+        "username": "new-user-1",
+        "email": "new-user-1@example.com",
+        "superuser": true,
+        "acl": [
+          { "control": "Allow", "service": "service 1" },
+          { "control": "Deny", "service": "*" }
+        ]
+      }
+    },
+    "rand": 123456789
+  }
 }
