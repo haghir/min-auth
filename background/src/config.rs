@@ -9,6 +9,11 @@ pub struct Config {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct DispatcherConfig {
+    pub expose: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct BgConfig {
     pub workers: usize,
 }

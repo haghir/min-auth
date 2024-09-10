@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.38"
+fs2 = "0.4.3"
 futures-util = "0.3.30"
 getopts = "0.2.21"
 hex = "0.4.3"

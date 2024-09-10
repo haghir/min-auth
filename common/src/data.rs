@@ -1,4 +1,5 @@
 use crate::{requests::Request, users::User, Result};
+use fs2::FileExt;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::LinkedList,
@@ -19,6 +20,8 @@ impl Data {
         P: AsRef<Path>,
     {
         let file = File::open(path)?;
+        file.lock_shared()?;
+
         let reader = BufReader::new(file);
         Ok(serde_json::from_reader(reader)?)
     }
