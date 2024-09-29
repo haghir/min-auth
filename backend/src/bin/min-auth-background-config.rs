@@ -1,5 +1,5 @@
 use getopts::Options;
-use min_auth_background::config::Config;
+use min_auth_backend::config::Config;
 use min_auth_common::error::Error;
 use min_auth_common::Result;
 use std::env;
@@ -26,7 +26,7 @@ fn main() -> Result<()> {
     let config = Config::load(config_path)?;
 
     if matches.opt_present("n") {
-        println!("{}", config.background.workers);
+        println!("{}", config.backend.workers);
     } else if matches.opt_present("r") {
         println!("{}", config.file_system.requests);
     } else if matches.opt_present("u") {

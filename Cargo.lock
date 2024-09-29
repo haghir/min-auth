@@ -1414,7 +1414,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "min-auth-background"
+name = "min-auth-backend"
 version = "3.0.0"
 dependencies = [
  "env_logger",

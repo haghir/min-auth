@@ -4,7 +4,7 @@ use std::{fs::File, io::BufReader, path::Path};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Config {
-    pub background: BgConfig,
+    pub backend: BgConfig,
     pub file_system: FsConfig,
 }
 
