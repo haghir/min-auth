@@ -1,4 +1,4 @@
-use crate::{requests::Request, users::User, Result};
+use crate::{requests::Request, users::User};
 use fs2::FileExt;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -15,7 +15,7 @@ pub enum Data {
 }
 
 impl Data {
-    pub fn load<P>(path: P) -> Result<Self>
+    pub fn load<P>(path: P) -> std::io::Result<Self>
     where
         P: AsRef<Path>,
     {
@@ -32,7 +32,7 @@ pub struct DataFinder {
 }
 
 impl DataFinder {
-    pub fn new<P>(data_dir: P) -> Result<Self>
+    pub fn new<P>(data_dir: P) -> std::io::Result<Self>
     where
         P: AsRef<Path>,
     {
@@ -45,7 +45,7 @@ impl DataFinder {
 }
 
 impl Iterator for DataFinder {
-    type Item = Result<Data>;
+    type Item = Result<Data, std::io::Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
@@ -94,7 +94,7 @@ impl Iterator for DataFinder {
     }
 }
 
-pub fn load_data<P>(data_dir: P) -> Result<Vec<Data>>
+pub fn load_data<P>(data_dir: P) -> Result<Vec<Data>, std::io::Error>
 where
     P: AsRef<Path>,
 {

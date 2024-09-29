@@ -1,4 +1,4 @@
-use crate::{data::Data, error::Error, users::AccessControl, Result};
+use crate::{data::Data, users::AccessControl};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
@@ -43,13 +43,13 @@ pub struct DeleteUserRequest {
 }
 
 impl Request {
-    pub fn load<P>(path: P) -> Result<Request>
+    pub fn load<P>(path: P) -> Result<Request, Box<dyn std::error::Error>>
     where
         P: AsRef<Path>,
     {
         match Data::load(&path)? {
             Data::Request(request) => Ok(request),
-            _ => Err(Error::new(format!("{:?} is not a request.", path.as_ref()))),
+            _ => Err(format!("{:?} is not a request.", path.as_ref()).into()),
         }
     }
 }

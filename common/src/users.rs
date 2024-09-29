@@ -1,8 +1,4 @@
-use crate::{
-    data::{Data, DataFinder},
-    error::Error,
-    Result,
-};
+use crate::data::{Data, DataFinder};
 use serde::{Deserialize, Serialize};
 use std::{collections::hash_map::HashMap, path::Path};
 
@@ -31,18 +27,18 @@ pub struct AccessControl {
 }
 
 impl User {
-    pub fn load<P>(path: P) -> Result<Self>
+    pub fn load<P>(path: P) -> Result<Self, Box<dyn std::error::Error>>
     where
         P: AsRef<Path>,
     {
         match Data::load(&path)? {
             Data::User(user) => Ok(user),
-            _ => Err(Error::new(format!("{:?} is not a user.", path.as_ref()))),
+            _ => Err(format!("{:?} is not a user.", path.as_ref()).into()),
         }
     }
 }
 
-pub fn load_users<P>(users_dir: P) -> Result<HashMap<String, User>>
+pub fn load_users<P>(users_dir: P) -> Result<HashMap<String, User>, Box<dyn std::error::Error>>
 where
     P: AsRef<Path>,
 {
