@@ -1,4 +1,4 @@
-use crate::data::{Data, DataFinder};
+use crate::data::{DataFinder, DataLoader};
 use serde::{Deserialize, Serialize};
 use std::{collections::hash_map::HashMap, path::Path};
 
@@ -27,33 +27,18 @@ pub struct AccessControl {
 }
 
 impl User {
-    pub fn load<P>(path: P) -> Result<Self, Box<dyn std::error::Error>>
+    pub fn load_all<P>(path: P) -> Result<HashMap<String, Self>, Box<dyn std::error::Error>>
     where
         P: AsRef<Path>,
     {
-        match Data::load(&path)? {
-            Data::User(user) => Ok(user),
-            _ => Err(format!("{:?} is not a user.", path.as_ref()).into()),
-        }
+        Ok(DataFinder::<User>::new(path.as_ref())?
+            .filter_map(|x| x.ok())
+            .map(|x| (x.username.clone(), x))
+            .collect())
     }
 }
 
-pub fn load_users<P>(users_dir: P) -> Result<HashMap<String, User>, Box<dyn std::error::Error>>
-where
-    P: AsRef<Path>,
-{
-    let users_dir = users_dir.as_ref();
-    let mut users: HashMap<String, User> = HashMap::new();
-    for data in DataFinder::new(&users_dir)? {
-        let data = data?;
-        let user = match data {
-            Data::User(item) => item,
-            _ => continue,
-        };
-        users.insert(user.username.clone(), user);
-    }
-    Ok(users)
-}
+impl DataLoader for User {}
 
 #[cfg(test)]
 mod tests {
@@ -78,7 +63,7 @@ mod tests {
 
     #[test]
     fn test_load_users() {
-        let users = load_users("test/users").unwrap();
+        let users = User::load_all("test/users").unwrap();
         assert_eq!(users.len(), 4);
 
         let user = users.get("Foo1 Foo1").unwrap();

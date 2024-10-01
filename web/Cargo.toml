@@ -1,7 +1,0 @@
-[package]
-name = "min-auth-web"
-version = "3.0.0"
-edition = "2021"
-
-[dependencies]
-min-auth-common = { path = "../common" }

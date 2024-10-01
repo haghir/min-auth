@@ -1,21 +1,21 @@
-use crate::{requests::Request, users::User};
 use fs2::FileExt;
-use serde::{Deserialize, Serialize};
+use serde::de::DeserializeOwned;
 use std::{
     collections::LinkedList,
     fs::{read_dir, File, ReadDir},
     io::BufReader,
+    marker::PhantomData,
     path::Path,
 };
 
-#[derive(Deserialize, Serialize, PartialEq, Clone, Debug)]
-pub enum Data {
-    Request(Request),
-    User(User),
-}
+pub mod requests;
+pub mod users;
 
-impl Data {
-    pub fn load<P>(path: P) -> std::io::Result<Self>
+pub trait DataLoader
+where
+    Self: DeserializeOwned,
+{
+    fn load<P>(path: P) -> std::io::Result<Self>
     where
         P: AsRef<Path>,
     {
@@ -27,11 +27,18 @@ impl Data {
     }
 }
 
-pub struct DataFinder {
+pub struct DataFinder<T>
+where
+    T: DataLoader,
+{
     readers: LinkedList<ReadDir>,
+    _x: PhantomData<T>,
 }
 
-impl DataFinder {
+impl<T> DataFinder<T>
+where
+    T: DataLoader,
+{
     pub fn new<P>(data_dir: P) -> std::io::Result<Self>
     where
         P: AsRef<Path>,
@@ -40,12 +47,18 @@ impl DataFinder {
         let reader = read_dir(data_dir)?;
         let mut readers = LinkedList::new();
         readers.push_back(reader);
-        Ok(Self { readers })
+        Ok(Self {
+            readers,
+            _x: Default::default(),
+        })
     }
 }
 
-impl Iterator for DataFinder {
-    type Item = Result<Data, std::io::Error>;
+impl<T> Iterator for DataFinder<T>
+where
+    T: DataLoader,
+{
+    type Item = Result<T, std::io::Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
@@ -89,14 +102,15 @@ impl Iterator for DataFinder {
                 continue;
             }
 
-            return Some(Data::load(path));
+            return Some(T::load(path));
         }
     }
 }
 
-pub fn load_data<P>(data_dir: P) -> Result<Vec<Data>, std::io::Error>
+pub fn load_all<T, P>(data_dir: P) -> Result<Vec<T>, std::io::Error>
 where
     P: AsRef<Path>,
+    T: DataLoader,
 {
     let data_dir = data_dir.as_ref();
     let mut ret = Vec::new();

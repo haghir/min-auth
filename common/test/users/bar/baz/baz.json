@@ -1,12 +1,10 @@
 {
-  "User": {
-    "id": "Baz",
-    "username": "Baz Baz",
-    "email": "baz@example.com",
-    "salt": "baz salt",
-    "password_hash": "baz hash",
-    "pubkey_fpr": "baz fpr",
-    "superuser": false,
-    "acl": [{ "control": "Deny", "service": "*" }]
-  }
+  "id": "Baz",
+  "username": "Baz Baz",
+  "email": "baz@example.com",
+  "salt": "baz salt",
+  "password_hash": "baz hash",
+  "pubkey_fpr": "baz fpr",
+  "superuser": false,
+  "acl": [{ "control": "Deny", "service": "*" }]
 }

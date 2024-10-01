@@ -1,0 +1,15 @@
+[package]
+name = "min-auth-service"
+version = "3.0.0"
+edition = "2021"
+
+[dependencies]
+bytes = "1.7.2"
+env_logger = "0.11.5"
+http-body-util = "0.1.2"
+hyper = { version = "1.4.1", features = ["full"] }
+hyper-util = { version = "0.1.9", features = ["full"] }
+log = "0.4.22"
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.128"
+tokio = { version = "1.40.0", features = ["full"] }

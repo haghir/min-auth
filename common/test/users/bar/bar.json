@@ -1,12 +1,10 @@
 {
-  "User": {
-    "id": "Bar",
-    "username": "Bar Bar",
-    "email": "bar@example.com",
-    "salt": "bar salt",
-    "password_hash": "bar hash",
-    "pubkey_fpr": "bar fpr",
-    "superuser": false,
-    "acl": [{ "control": "Allow", "service": "*" }]
-  }
+  "id": "Bar",
+  "username": "Bar Bar",
+  "email": "bar@example.com",
+  "salt": "bar salt",
+  "password_hash": "bar hash",
+  "pubkey_fpr": "bar fpr",
+  "superuser": false,
+  "acl": [{ "control": "Allow", "service": "*" }]
 }

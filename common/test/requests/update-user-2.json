@@ -1,15 +1,13 @@
 {
-  "Request": {
-    "id": "update-user-2-request",
-    "issuer": "update-user-2-issuer",
-    "timestamp": "2024-01-01 12:34:56.789",
-    "content": {
-      "UpdateUser": {
-        "user_id": "user-2-id",
-        "renew_password": false,
-        "renew_pubkey": false
-      }
-    },
-    "rand": 987654321
-  }
+  "id": "update-user-2-request",
+  "issuer": "update-user-2-issuer",
+  "timestamp": "2024-01-01 12:34:56.789",
+  "content": {
+    "UpdateUser": {
+      "user_id": "user-2-id",
+      "renew_password": false,
+      "renew_pubkey": false
+    }
+  },
+  "rand": 987654321
 }

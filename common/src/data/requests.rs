@@ -1,6 +1,7 @@
-use crate::{data::Data, users::AccessControl};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
+
+use super::{users::AccessControl, DataFinder, DataLoader};
 
 #[derive(Deserialize, Serialize, PartialEq, Clone, Debug)]
 pub enum RequestContent {
@@ -43,21 +44,22 @@ pub struct DeleteUserRequest {
 }
 
 impl Request {
-    pub fn load<P>(path: P) -> Result<Request, Box<dyn std::error::Error>>
+    pub fn load_all<P>(path: P) -> Result<Vec<Self>, Box<dyn std::error::Error>>
     where
         P: AsRef<Path>,
     {
-        match Data::load(&path)? {
-            Data::Request(request) => Ok(request),
-            _ => Err(format!("{:?} is not a request.", path.as_ref()).into()),
-        }
+        Ok(DataFinder::<Request>::new(path.as_ref())?
+            .filter_map(|x| x.ok())
+            .collect())
     }
 }
+
+impl DataLoader for Request {}
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::users::AccessControlKind;
+    use crate::data::users::AccessControlKind;
 
     #[test]
     fn test_load_request() {

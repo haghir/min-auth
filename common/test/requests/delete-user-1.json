@@ -1,13 +1,11 @@
 {
-  "Request": {
-    "id": "delete-user-1-request",
-    "issuer": "delete-user-1-issuer",
-    "timestamp": "2024-01-01 12:34:56.789",
-    "content": {
-      "DeleteUser": {
-        "user_id": "user-1-id"
-      }
-    },
-    "rand": 123456789
-  }
+  "id": "delete-user-1-request",
+  "issuer": "delete-user-1-issuer",
+  "timestamp": "2024-01-01 12:34:56.789",
+  "content": {
+    "DeleteUser": {
+      "user_id": "user-1-id"
+    }
+  },
+  "rand": 123456789
 }

@@ -1,15 +1,13 @@
 {
-  "User": {
-    "id": "Foo1",
-    "username": "Foo1 Foo1",
-    "email": "foo1@example.com",
-    "salt": "foo1 salt",
-    "password_hash": "foo1 hash",
-    "pubkey_fpr": "foo1 fpr",
-    "superuser": true,
-    "acl": [
-      { "control": "Allow", "service": "service 1" },
-      { "control": "Deny", "service": "*" }
-    ]
-  }
+  "id": "Foo1",
+  "username": "Foo1 Foo1",
+  "email": "foo1@example.com",
+  "salt": "foo1 salt",
+  "password_hash": "foo1 hash",
+  "pubkey_fpr": "foo1 fpr",
+  "superuser": true,
+  "acl": [
+    { "control": "Allow", "service": "service 1" },
+    { "control": "Deny", "service": "*" }
+  ]
 }
