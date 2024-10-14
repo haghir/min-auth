@@ -8,6 +8,7 @@ use std::{
     path::Path,
 };
 
+pub mod credentials;
 pub mod requests;
 pub mod users;
 

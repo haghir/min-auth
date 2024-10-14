@@ -1,4 +1,7 @@
-use crate::data::{DataFinder, DataLoader};
+use crate::{
+    data::{DataFinder, DataLoader},
+    DynError,
+};
 use serde::{Deserialize, Serialize};
 use std::{collections::hash_map::HashMap, path::Path};
 
@@ -27,7 +30,7 @@ pub struct AccessControl {
 }
 
 impl User {
-    pub fn load_all<P>(path: P) -> Result<HashMap<String, Self>, Box<dyn std::error::Error>>
+    pub fn load_all<P>(path: P) -> Result<HashMap<String, Self>, DynError>
     where
         P: AsRef<Path>,
     {

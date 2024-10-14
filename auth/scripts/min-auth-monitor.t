@@ -1,7 +1,8 @@
 #!/bin/sh
 
-AUTH_URI="$({bindir}/min-auth-getauthuri -c {confdir}/config.toml -p ${1})"
-
-if ! curl -m 5 "${AUTH_URI}" ; then
-	systemctl restart min-auth@${1}
-fi
+{bindir}/min-auth-auth -c "{confdir}/auth.toml" -u | while read -r ADDR; do
+    if ! curl -m 5 "http://${ADDR}/auth" ; then
+        systemctl restart min-auth-auth
+        exit 1
+    fi
+done

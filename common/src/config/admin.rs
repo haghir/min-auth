@@ -7,10 +7,11 @@ use std::{
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct AuthConfig {
+pub struct AdminConfig {
     pub expose: ExposeConfig,
-    pub security: SecurityConfig,
     pub redis: RedisConfig,
+    pub security: SecurityConfig,
+    pub file_system: FsConfig,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -19,16 +20,23 @@ pub struct ExposeConfig {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct RedisConfig {
+    pub session: String,
+    pub auth: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SecurityConfig {
     pub password_secret: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct RedisConfig {
-    pub uri: String,
+pub struct FsConfig {
+    pub users: String,
+    pub requests: String,
 }
 
-impl AuthConfig {
+impl AdminConfig {
     pub fn load<P>(path: P) -> Result<Self, DynError>
     where
         P: AsRef<Path>,
@@ -48,7 +56,7 @@ impl AuthConfig {
     }
 }
 
-impl TryFrom<&str> for AuthConfig {
+impl TryFrom<&str> for AdminConfig {
     type Error = toml::de::Error;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
@@ -56,10 +64,10 @@ impl TryFrom<&str> for AuthConfig {
     }
 }
 
-impl TryFrom<&AuthConfig> for String {
+impl TryFrom<&AdminConfig> for String {
     type Error = toml::ser::Error;
 
-    fn try_from(value: &AuthConfig) -> Result<Self, Self::Error> {
+    fn try_from(value: &AdminConfig) -> Result<Self, Self::Error> {
         toml::ser::to_string(value)
     }
 }
