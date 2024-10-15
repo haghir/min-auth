@@ -2,12 +2,14 @@ use bytes::Bytes;
 use getopts::Options;
 use http_auth_basic::Credentials;
 use http_body_util::Full;
-use hyper::server::conn::http1;
-use hyper::{body::Incoming, header, service::Service, Method, Request, Response, StatusCode};
+use hyper::{
+    body::Incoming, header, server::conn::http1, service::Service, Method, Request, Response,
+    StatusCode,
+};
 use hyper_util::rt::TokioIo;
 use log::error;
 use min_auth_common::{
-    config::auth::AuthConfig, data::credentials::Credentials as CredData, utils::emsg, DynError,
+    config::auth::AuthConfig, data::credentials::Credentials as CredData, error::Error, DynError,
 };
 use redis::{AsyncCommands, Client as RedisClient};
 use std::{
@@ -37,20 +39,33 @@ impl Service<Request<Incoming>> for AuthService {
         Box::pin(async move {
             let method = req.method();
             let path = req.uri().path();
-            match match (method, path) {
+            match (method, path) {
                 (&Method::GET, "/auth") => auth(req, &redis, &config).await,
-                (method, path) => Err(emsg(format!("Illegal request ({} {})", method, path))),
-            } {
-                Ok(body) => Ok(body),
-                Err(_) => Ok(Response::builder()
-                    .status(StatusCode::UNAUTHORIZED)
-                    .body("".to_string().into_bytes().into())?),
+                (method, path) => {
+                    Err(Error::new(format!("Illegal request ({} {})", method, path)).into())
+                }
             }
         })
     }
 }
 
 async fn auth(
+    req: Request<Incoming>,
+    redis: &Arc<Mutex<RedisClient>>,
+    config: &Arc<RwLock<AuthConfig>>,
+) -> Result<Response<Full<Bytes>>, DynError> {
+    match auth_body(req, redis, config).await {
+        Ok(res) => Ok(res),
+        Err(e) => {
+            error!("{:?}", e);
+            Ok(Response::builder()
+                .status(StatusCode::UNAUTHORIZED)
+                .body("".to_string().into_bytes().into())?)
+        }
+    }
+}
+
+async fn auth_body(
     req: Request<Incoming>,
     redis: &Arc<Mutex<RedisClient>>,
     config: &Arc<RwLock<AuthConfig>>,
@@ -63,24 +78,24 @@ async fn auth(
     // Retrieve credentials
     let basic = match req.headers().get(header::AUTHORIZATION) {
         Some(basic) => basic.to_str()?.to_string(),
-        None => return Err(emsg("No authorization header was found.")),
+        None => return Err(Error::new("No authorization header was found.").into()),
     };
     let basic = match Credentials::from_header(basic) {
         Ok(basic) => basic,
-        Err(e) => return Err(emsg(e.to_string())),
+        Err(e) => return Err(Error::new(e).into()),
     };
 
     // Retrieve service name
     let query = match req.uri().query() {
         Some(query) => query,
-        None => return Err(emsg("No query was specified.")),
+        None => return Err(Error::new("No query was specified.").into()),
     };
     let query: HashMap<String, String> = form_urlencoded::parse(query.as_bytes())
         .into_owned()
         .collect();
     let service = match query.get("service") {
         Some(service) => service,
-        None => return Err(emsg("No service was speficied.")),
+        None => return Err(Error::new("No service was speficied.").into()),
     };
 
     // Retrieve a credential JSON from the Redis server
@@ -93,10 +108,10 @@ async fn auth(
 
     // Verify
     if !cred.verify(&secret, &basic.password) {
-        return Err(emsg(format!("Invalid password for {}.", cred.id)));
+        return Err(Error::new(format!("Invalid password for {}.", cred.id)).into());
     }
     if !cred.allowed(&service) {
-        return Err(emsg(format!("{} is not allowed for {}.", service, cred.id)));
+        return Err(Error::new(format!("{} is not allowed for {}.", service, cred.id)).into());
     }
 
     Ok(Response::builder()
@@ -129,17 +144,17 @@ async fn main() -> Result<(), DynError> {
     }
 
     let sockets = config.expose.sockets.clone();
-    let redis = RedisClient::open(config.redis.uri.as_str())?;
+    let redis_uri = config.redis.uri.clone();
 
     let config = Arc::new(RwLock::new(config));
-    let redis = Arc::new(Mutex::new(redis));
 
     let mut join_set: JoinSet<Result<(), DynError>> = JoinSet::new();
 
     // Authentication Service
     for socket in sockets {
         let config = Arc::clone(&config);
-        let redis = Arc::clone(&redis);
+        let redis = RedisClient::open(redis_uri.as_str())?;
+        let redis = Arc::new(Mutex::new(redis));
 
         join_set.spawn(async move {
             let addr = SocketAddr::from_str(socket.as_str())?;

@@ -2,8 +2,8 @@ use chrono::Utc;
 use log::info;
 use rand::{thread_rng, Rng};
 
-use crate::base35::to_base35;
-use crate::threadid::gettid;
+use super::base35::to_base35;
+use super::threadid::gettid;
 
 pub fn genid() -> String {
     // Return the base35 string from the following byte sequence.
@@ -19,16 +19,20 @@ pub fn genid() -> String {
     let now = Utc::now().timestamp_micros();
     let tid = gettid();
     let mut rng = thread_rng();
-    let mut val: Vec<u8> = (0..18).map(|i| if i == 0 {
-        // Make the number 29-digit in 35 decimal notation.
-        rng.gen::<u8>() | 0xe0
-    } else if i < 7 {
-        rng.gen()
-    } else if i < 11 {
-        (tid >> ((10 - i) * 8)) as u8
-    } else {
-        (now >> ((17 - i) * 8)) as u8
-    }).collect();
+    let mut val: Vec<u8> = (0..18)
+        .map(|i| {
+            if i == 0 {
+                // Make the number 29-digit in 35 decimal notation.
+                rng.gen::<u8>() | 0xe0
+            } else if i < 7 {
+                rng.gen()
+            } else if i < 11 {
+                (tid >> ((10 - i) * 8)) as u8
+            } else {
+                (now >> ((17 - i) * 8)) as u8
+            }
+        })
+        .collect();
     val[0] |= 0x80;
 
     let mut ret = to_base35(&val);
