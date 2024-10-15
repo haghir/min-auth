@@ -3,8 +3,8 @@ use getopts::Options;
 use http_auth_basic::Credentials;
 use http_body_util::Full;
 use hyper::{
-    body::Incoming, header, server::conn::http1, service::Service, Method, Request, Response,
-    StatusCode,
+    body::Incoming, header, server::conn::http1, service::Service as HyperService, Method, Request,
+    Response, StatusCode,
 };
 use hyper_util::rt::TokioIo;
 use log::error;
@@ -21,13 +21,83 @@ use tokio::{
     task::JoinSet,
 };
 
-#[derive(Debug, Clone)]
-pub struct AuthService {
-    pub config: Arc<RwLock<AuthConfig>>,
-    pub redis: Arc<Mutex<RedisClient>>,
+#[tokio::main]
+async fn main() -> Result<(), DynError> {
+    env_logger::init();
+
+    let args: Vec<String> = env::args().collect();
+    let mut opts = Options::new();
+    opts.optopt("c", "config", "path to a config file", "CONFIG");
+    opts.optflag("u", "uri", "show service URIs");
+    let matches = opts.parse(&args[1..])?;
+    let config_path = match matches.opt_str("c") {
+        Some(path) => path,
+        None => return Err("No config path was specified.".into()),
+    };
+
+    let config = AuthConfig::load(&config_path)?;
+
+    // If the "u" flag is speficied, just show all sockets.
+    if matches.opt_present("u") {
+        for socket in config.expose.sockets {
+            println!("{}", socket);
+        }
+        return Ok(());
+    }
+
+    let sockets = config.expose.sockets.clone();
+    let redis_uri = config.redis.uri.clone();
+
+    let config = Arc::new(RwLock::new(config));
+
+    let mut join_set: JoinSet<Result<(), DynError>> = JoinSet::new();
+
+    // Authentication Service
+    for socket in sockets {
+        let config = Arc::clone(&config);
+        let redis = RedisClient::open(redis_uri.as_str())?;
+        let redis = Arc::new(Mutex::new(redis));
+
+        join_set.spawn(async move {
+            let addr = SocketAddr::from_str(socket.as_str())?;
+            let listener = TcpListener::bind(addr).await?;
+            let svc = Service { config, redis };
+            loop {
+                let (stream, _) = listener.accept().await?;
+                let io = TokioIo::new(stream);
+                let svc_clone = svc.clone();
+                tokio::task::spawn(async move {
+                    if let Err(err) = http1::Builder::new().serve_connection(io, svc_clone).await {
+                        error!("{:?}", err);
+                    }
+                });
+            }
+        });
+    }
+
+    while let Some(join) = join_set.join_next().await {
+        match join {
+            Ok(ret) => {
+                if let Err(e) = ret {
+                    error!("{}", e);
+                }
+            }
+            Err(e) => {
+                error!("{}", e);
+            }
+        }
+    }
+
+    Ok(())
 }
 
-impl Service<Request<Incoming>> for AuthService {
+#[derive(Debug, Clone)]
+struct Service {
+    config: Arc<RwLock<AuthConfig>>,
+    redis: Arc<Mutex<RedisClient>>,
+}
+
+impl HyperService<Request<Incoming>> for Service {
     type Response = Response<Full<Bytes>>;
     type Error = DynError;
     type Future = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>> + Send>>;
@@ -57,7 +127,7 @@ async fn auth(
     match auth_body(req, redis, config).await {
         Ok(res) => Ok(res),
         Err(e) => {
-            error!("{:?}", e);
+            error!("{}", e);
             Ok(Response::builder()
                 .status(StatusCode::UNAUTHORIZED)
                 .body("".to_string().into_bytes().into())?)
@@ -117,74 +187,4 @@ async fn auth_body(
     Ok(Response::builder()
         .status(StatusCode::OK)
         .body("".to_string().into_bytes().into())?)
-}
-
-#[tokio::main]
-async fn main() -> Result<(), DynError> {
-    env_logger::init();
-
-    let args: Vec<String> = env::args().collect();
-    let mut opts = Options::new();
-    opts.optopt("c", "config", "path to a config file", "CONFIG");
-    opts.optflag("u", "uri", "show service URIs");
-    let matches = opts.parse(&args[1..])?;
-    let config_path = match matches.opt_str("c") {
-        Some(path) => path,
-        None => return Err("No config path was specified.".into()),
-    };
-
-    let config = AuthConfig::load(&config_path)?;
-
-    // If the "u" flag is speficied, just show all sockets.
-    if matches.opt_present("u") {
-        for socket in config.expose.sockets {
-            println!("{}", socket);
-        }
-        return Ok(());
-    }
-
-    let sockets = config.expose.sockets.clone();
-    let redis_uri = config.redis.uri.clone();
-
-    let config = Arc::new(RwLock::new(config));
-
-    let mut join_set: JoinSet<Result<(), DynError>> = JoinSet::new();
-
-    // Authentication Service
-    for socket in sockets {
-        let config = Arc::clone(&config);
-        let redis = RedisClient::open(redis_uri.as_str())?;
-        let redis = Arc::new(Mutex::new(redis));
-
-        join_set.spawn(async move {
-            let addr = SocketAddr::from_str(socket.as_str())?;
-            let listener = TcpListener::bind(addr).await?;
-            let svc = AuthService { config, redis };
-            loop {
-                let (stream, _) = listener.accept().await?;
-                let io = TokioIo::new(stream);
-                let svc_clone = svc.clone();
-                tokio::task::spawn(async move {
-                    if let Err(err) = http1::Builder::new().serve_connection(io, svc_clone).await {
-                        error!("{:?}", err);
-                    }
-                });
-            }
-        });
-    }
-
-    while let Some(join) = join_set.join_next().await {
-        match join {
-            Ok(ret) => {
-                if let Err(e) = ret {
-                    error!("{}", e);
-                }
-            }
-            Err(e) => {
-                error!("{}", e);
-            }
-        }
-    }
-
-    Ok(())
 }

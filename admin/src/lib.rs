@@ -1,2 +1,2 @@
-pub mod admin;
+pub mod service;
 pub mod session;
